@@ -4,7 +4,6 @@
     <b-form-select
       id="audio-source-select"
       v-model="audioSource"
-      @change="onAudioSourceSelected"
       v-b-tooltip.hover
       title="The audio source (e.g. device) to capture sound from."
     >
@@ -40,7 +39,7 @@
       type="number"
       :number="true"
       :no-wheel="true"
-      :disabled="!this.audioFormat?.sampleRate"
+      :disabled="!this.audioFormat || !this.audioFormat.sampleRate"
       trim
       v-b-tooltip.hover
       title="The number of samples from the continuous signal to take per second. Higher values result in better quality. Not all values are supported by all players."
@@ -53,7 +52,7 @@ import { getRecordingState } from '../stores/RecordingState'
 import { audioSourceService } from '../services/AudioSourceService'
 import _ from "lodash"
 
-const recordingState = getRecordingState()
+var recordingState = null
 
 export default {
   name: "CaptureSourceSettings",
@@ -81,6 +80,8 @@ export default {
   },
 
   mounted() {
+    recordingState = getRecordingState()
+
     audioSourceService.getAudioSources().then((availableAudioSources) => {
       this.availableAudioSources = availableAudioSources;
 
@@ -90,11 +91,11 @@ export default {
     });
   },
 
-  methods: {
-    onAudioSourceSelected(audioSource) {
+  watch: {
+    audioSource(audioSource) {
       recordingState.audioSource = audioSource
 
-      this.getAndRankAudioFormats(audioSource).then((rankedFormats) => {
+      this.getAndRankAudioFormats(audioSource.id).then((rankedFormats) => {
         this.availableAudioFormats = rankedFormats
         
         if (recordingState.currentCapture?.audioSource == audioSource) {
@@ -104,13 +105,18 @@ export default {
         }
       })
     },
+    audioFormat(audioFormat) {
+      recordingState.audioFormat = audioFormat
+    }
+  },
 
+  methods: {
     getAndRankAudioFormats(audioSource) {
       if (!audioSource) {
         return [];
       }
       return audioSourceService
-        .getFormatsOfAudioSource(audioSource)
+        .getAudioFormats(audioSource)
         .then((formats) => {
           const formatsWithDefaults = _.map(formats, this.convertAudioFormat);
           return _.sortBy(

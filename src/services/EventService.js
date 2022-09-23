@@ -2,6 +2,7 @@
 import SockJS from "sockjs-client"
 import Stomp from "webstomp-client"
 import { appConfig } from '../Config'
+import PubSub from 'pubsub-js'
 
 // Event IDs
 // Generic:
@@ -38,7 +39,7 @@ export const eventService = {
         console.debug(`Connecting to websocket endpoint at ${wsEndpoint}`)
         const stompClient = Stomp.over(new SockJS(wsEndpoint))
         stompClient.connect(
-            headers = {},
+            {},
             () => {
                 stompClient.subscribe(WS_TOPIC_CAPTURE, (tick) => {
                     const event = JSON.parse(tick.body)

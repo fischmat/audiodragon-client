@@ -17,6 +17,9 @@ export const captureService = {
             outputFormat: outputFormat,
             recognizeSongs: recognizeSongs
         })
+        .then((response) => {
+            return response.data
+        })
     },
 
     /**
@@ -27,6 +30,9 @@ export const captureService = {
      */
      stopCapture(afterTrack, audioSourceId) {
         return api.delete(`v1/capture/${audioSourceId}?immediately=${!afterTrack}`)
+            .then((response) => {
+                return response.data
+            })
     },
 
     /**
@@ -36,6 +42,9 @@ export const captureService = {
      */
     getOngoingRecording(audioSourceId) {
         return api.get(`v1/capture/${audioSourceId}`)
+            .then((response) => {
+                return response.data
+            })
     },
 
     /**
@@ -45,6 +54,9 @@ export const captureService = {
      */
      getCurrentTrack(audioSourceId) {
         return api.get(`v1/capture/${audioSourceId}/track`)
+            .then((response) => {
+                return response.data
+            })
     },
 
     /**
@@ -55,5 +67,8 @@ export const captureService = {
      */
      updateCurrentTrack(track, audioSourceId) {
         return api.put(`v1/capture/${audioSourceId}/track`, track)
+            .then((response) => {
+                return response.data
+            })
     }
 }

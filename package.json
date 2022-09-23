@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@vue/composition-api": "^1.7.0",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.1",
     "bootstrap-vue": "^2.22.0",
@@ -27,6 +28,7 @@
     "@vue/cli-service": "~5.0.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
+    "vue-cli-plugin-pinia": "~0.1.5",
     "vue-template-compiler": "^2.6.14"
   },
   "eslintConfig": {

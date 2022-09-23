@@ -55,7 +55,7 @@
 
 <script>
 import { getRecordingState } from '../stores/RecordingState'
-const recordingState = getRecordingState()
+var recordingState = null
 
 export default {
   components: {},
@@ -76,6 +76,7 @@ export default {
     },
   },
   mounted() {
+    recordingState = getRecordingState()
     recordingState.outputFormat = this.format
   },
 };
