@@ -12,7 +12,7 @@
       </div>
 
       <div class="col-md-12" v-if="bufferStats.type == 'inMemory'">
-        <label><b-badge>In-Memory</b-badge> {{toHumanReadableMemorySize(bufferStats.size)}} / {{toHumanReadableMemorySize(bufferStats.maxMemory)}}</label>
+        <label class="buffer-stats">{{toHumanReadableMemorySize(bufferStats.size)}} / {{toHumanReadableMemorySize(bufferStats.maxMemory)}} <b-badge class="buffer-badge">In-Memory</b-badge></label>
         <b-progress :max="bufferStats.maxMemory">
           <b-progress-bar  v-bind:style="getMeterStyle(bufferStats.size, 0, bufferStats.maxMemory)"
             :value="bufferStats.size"
@@ -23,7 +23,7 @@
       </div>
 
       <div class="col-md-12" v-if="bufferStats.type == 'diskSpilling'">
-        <label><b-badge>Hybrid buffering</b-badge> Buffer size: {{toHumanReadableMemorySize(bufferStats.size)}} / {{toHumanReadableMemorySize(bufferStats.freeDiskSpace)}} on disk</label>
+        <label class="buffer-stats">Buffer size: {{toHumanReadableMemorySize(bufferStats.size)}} / {{toHumanReadableMemorySize(bufferStats.freeDiskSpace)}} on disk <b-badge class="buffer-badge">Hybrid buffering</b-badge></label>
         <b-progress :max="bufferStats.maxMemory">
           <b-progress-bar  v-bind:style="getMeterStyle(bufferStats.size, 0, bufferStats.freeDiskSpace)"
             :value="bufferStats.size"
@@ -124,5 +124,11 @@ export default {
 }
 label {
   margin-top: 10px;
+}
+.buffer-stats {
+  width: 100%;
+}
+.buffer-badge {
+  float: right;
 }
 </style>
