@@ -51,6 +51,7 @@
 import { getRecordingState } from '../stores/RecordingState'
 import { audioSourceService } from '../services/AudioSourceService'
 import _ from "lodash"
+import { captureService } from '@/services/CaptureService'
 
 var recordingState = null
 
@@ -98,11 +99,13 @@ export default {
       this.getAndRankAudioFormats(audioSource.id).then((rankedFormats) => {
         this.availableAudioFormats = rankedFormats
         
-        if (recordingState.currentCapture?.audioSource == audioSource) {
-          this.audioFormat = recordingState.currentCapture.audioFormat
-        } else {
+        captureService.getOngoingRecording(audioSource.id).then((capture) => {
+          recordingState.currentCapture = capture
+          this.audioFormat = capture.audioFormat
+        })
+        .catch(() => {
           this.audioFormat = _.head(this.availableAudioFormats)
-        }
+        })
       })
     },
     audioFormat(audioFormat) {
