@@ -1,18 +1,20 @@
 <template>
   <div id="app">
     <RecordingSidebar />
+    <RecordingContentPane />
   </div>
 </template>
 
 <script>
 import RecordingSidebar from './components/RecordingSidebar.vue'
+import RecordingContentPane from './components/RecordingContentPane.vue'
 import { eventService } from '@/services/EventService'
 import { getRecordingState } from '@/stores/RecordingState'
 
 export default {
   name: 'App',
   components: {
-    RecordingSidebar
+    RecordingSidebar, RecordingContentPane
   },
   mounted() {
     const recordingState = getRecordingState()

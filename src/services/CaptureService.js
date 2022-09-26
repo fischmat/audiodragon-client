@@ -1,4 +1,5 @@
 import { api } from './API'
+import _ from "lodash"
 
 export const captureService = {
 
@@ -66,7 +67,11 @@ export const captureService = {
      * @returns A promise with the response.
      */
      updateCurrentTrack(track, audioSourceId) {
-        return api.put(`v1/capture/${audioSourceId}/track`, track)
+        const nonEmptyData = _.pickBy(track, (v) => !_.isEmpty(v))
+        if (_.isEmpty(nonEmptyData)) {
+            return
+        }
+        return api.put(`v1/capture/${audioSourceId}/track`, nonEmptyData)
             .then((response) => {
                 return response.data
             })
