@@ -1,14 +1,16 @@
 <template>
   <div id="content">
       <TrackInfoPanel />
+      <RecordingMetrics />
   </div>
 </template>
 
 <script>
 import TrackInfoPanel from './TrackInfoPanel.vue'
+import RecordingMetrics from './RecordingMetrics.vue'
 
 export default {
-  components: { TrackInfoPanel },
+  components: { TrackInfoPanel, RecordingMetrics },
   name: "RecordingContentPane"
 };
 </script>

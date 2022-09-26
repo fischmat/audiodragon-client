@@ -1,4 +1,10 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
-  transpileDependencies: true
+  transpileDependencies: true,
+  devServer: {
+		open: true,
+		host: 'localhost',
+		port: 3000,
+		https: false,
+  },
 })

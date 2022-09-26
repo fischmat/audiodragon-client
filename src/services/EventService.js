@@ -19,7 +19,7 @@ const EVENT_ID_TRACK_RECOGNIZED = 'trackRecognized'
 const EVENT_ID_METRICS_RMS = 'metrics_rms'
 const EVENT_ID_METRICS_FREQUENCIES = 'metrics_frequencies'
 const EVENT_ID_METRICS_TRACK_TIME = 'metrics_track_time'
-const EVENT_ID_METRICS_BUFFER_SIZE = 'metrics_buffer_size'
+const EVENT_ID_METRICS_BUFFER_STATS = 'metrics_buffer_stats'
 
 // Prefixes
 const WS_TOPIC_CAPTURE = '/capture'
@@ -49,7 +49,7 @@ export const eventService = {
                     const event = JSON.parse(tick.body)
                     PubSub.publish(EVENT_ID_METRICS_RMS, event.rms)
                     PubSub.publish(EVENT_ID_METRICS_FREQUENCIES, event.frequencies)
-                    PubSub.publish(EVENT_ID_METRICS_BUFFER_SIZE, event.bufferSize)
+                    PubSub.publish(EVENT_ID_METRICS_BUFFER_STATS, event.buffer)
                     PubSub.publish(EVENT_ID_METRICS_TRACK_TIME, event.trackTime)
                 })
             },
@@ -95,8 +95,8 @@ export const eventService = {
             frequencies(callback) {
                 PubSub.subscribe(EVENT_ID_METRICS_FREQUENCIES, (_, evt) => callback(evt))
             },
-            bufferSize(callback) {
-                PubSub.subscribe(EVENT_ID_METRICS_BUFFER_SIZE, (_, evt) => callback(evt))
+            bufferStats(callback) {
+                PubSub.subscribe(EVENT_ID_METRICS_BUFFER_STATS, (_, evt) => callback(evt))
             },
             trackTime(callback) {
                 PubSub.subscribe(EVENT_ID_METRICS_TRACK_TIME, (_, evt) => callback(evt))
