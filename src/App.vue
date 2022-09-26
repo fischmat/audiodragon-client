@@ -17,7 +17,7 @@ export default {
     RecordingSidebar, RecordingContentPane
   },
   mounted() {
-    const recordingState = getRecordingState()
+    const recordingState = this.loadState()
     eventService.connect()
 
     eventService.capture().onStarted((event) => {
@@ -26,6 +26,31 @@ export default {
     eventService.capture().onEnded(() => {
       recordingState.currentCapture = null
     })
+
+    recordingState.$subscribe((_, state) => {
+      this.persistState(state)
+    })
+  },
+
+  methods: {
+    loadState() {
+      const recordingState = getRecordingState()
+      if (localStorage.audioSource) {
+        recordingState.audioSource = JSON.parse(localStorage.audioSource)
+      }
+      if (localStorage.audioFormat) {
+        recordingState.audioFormat = JSON.parse(localStorage.audioFormat)
+      }
+      if (localStorage.outputFormat) {
+        recordingState.outputFormat = JSON.parse(localStorage.outputFormat)
+      }
+      return recordingState
+    },
+    persistState(state) {
+      localStorage.audioSource = JSON.stringify(state.audioSource)
+      localStorage.audioFormatId = JSON.stringify(state.audioFormat)
+      localStorage.outputFormat = JSON.stringify(state.outputFormat)
+    }
   }
 }
 </script>

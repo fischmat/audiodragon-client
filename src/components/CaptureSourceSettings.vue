@@ -86,8 +86,8 @@ export default {
     audioSourceService.getAudioSources().then((availableAudioSources) => {
       this.availableAudioSources = availableAudioSources;
 
-      if (recordingState.currentCapture) {
-        this.audioSource = recordingState.currentCapture.audioSource
+      if (recordingState.audioSource) {
+        this.audioSource = recordingState.audioSource
       }
     });
   },
