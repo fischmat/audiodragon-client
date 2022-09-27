@@ -119,9 +119,7 @@ export default {
 
 <style scoped>
 .metrics-container {
-  width: 75vw;
   margin: 0 auto;
-  margin-top: 70px;
 }
 .gauge {
   max-width: 300px;

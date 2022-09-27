@@ -1,7 +1,7 @@
 <template>
   <div id="content">
-      <TrackInfoPanel />
-      <RecordingMetrics />
+      <TrackInfoPanel id="track-info-panel" />
+      <RecordingMetrics id="recording-metrics" />
   </div>
 </template>
 
@@ -23,5 +23,9 @@ export default {
 
 .tab-icon {
   color: #adafae;
+}
+
+#recording-metrics {
+  margin-top: 70px;
 }
 </style>
