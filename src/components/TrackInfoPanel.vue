@@ -16,6 +16,7 @@
         <b-form-input
           id="track-title"
           v-model="track.title"
+          :readonly="!isRecording"
           trim
         ></b-form-input>
 
@@ -23,6 +24,7 @@
         <b-form-input
           id="track-artist"
           v-model="track.artist"
+          :readonly="!isRecording"
           trim
         ></b-form-input>
 
@@ -30,6 +32,7 @@
         <b-form-input
           id="track-album"
           v-model="track.album"
+          :readonly="!isRecording"
           trim
         ></b-form-input>
 
@@ -39,6 +42,7 @@
           input-id="tags-basic"
           separator=" ,;"
           v-model="track.genres"
+          :disabled="!isRecording"
         >
         </b-form-tags>
 
@@ -46,6 +50,7 @@
         <b-form-input
           id="track-year"
           v-model="track.releaseYear"
+          :readonly="!isRecording"
           trim
         ></b-form-input>
 
@@ -55,6 +60,7 @@
           input-id="tags-basic"
           separator=" ,;"
           v-model="track.labels"
+          :disabled="!isRecording"
         >
         </b-form-tags>
 
@@ -62,6 +68,7 @@
         <b-form-input
           id="track-coverart-url"
           v-model="track.coverartImageUrl"
+          :readonly="!isRecording"
           trim
         ></b-form-input>
       </div>
@@ -91,6 +98,7 @@ export default {
     return {
       track: _.cloneDeep(EMPTY_TRACK),
       emptyTrackImage: require("../assets/notrack.png"),
+      isRecording: false,
       recordingState: getRecordingState()
     };
   },
@@ -108,8 +116,11 @@ export default {
     if (this.recordingState.audioSource) {
       this.getTrackData(this.recordingState.audioSource.id)
     }
+
+    this.isRecording = !!this.recordingState.currentCapture
     this.recordingState.$subscribe((_, state) => {
       this.getTrackData(state.audioSource.id)
+      this.isRecording = !!state.currentCapture
     })
   },
   methods: {
@@ -145,5 +156,15 @@ export default {
 label {
   margin-top: 10px;
   margin-bottom: 0px;
+}
+.form-control[readonly] {
+  background-color: #ddd;
+}
+.form-control[readonly]:hover {
+  cursor: not-allowed;
+}
+.b-form-tags.disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
 }
 </style>
