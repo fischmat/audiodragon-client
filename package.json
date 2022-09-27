@@ -13,12 +13,14 @@
     "bootstrap": "^4.6.2",
     "bootstrap-vue": "^2.22.0",
     "core-js": "^3.8.3",
+    "konva": "^8.3.12",
     "lodash": "^4.17.21",
     "pinia": "^2.0.22",
     "pubsub-js": "^1.9.4",
     "rainbowvis.js": "^1.1.1",
     "sockjs-client": "^1.6.1",
     "vue": "^2.6.14",
+    "vue-konva": "^2.1.7",
     "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
