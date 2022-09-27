@@ -66,6 +66,11 @@ export default {
     eventService.metrics().bufferStats((bufferStats) => {
       this.bufferStats = bufferStats
     })
+    eventService.capture().onEnded(() => {
+      this.rms = 0.0
+      this.trackTime = 0
+      this.bufferStats = {}
+    })
   },
   methods: {
       toHumanReadableMemorySize(sizeInBytes) {
