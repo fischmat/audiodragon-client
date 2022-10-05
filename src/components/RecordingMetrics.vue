@@ -36,6 +36,11 @@
       <div class="col-md-6">
         <p>Track Time: {{getTrackTime()}}</p>
       </div>
+
+      <div class="col-md-12">
+        <label>Frequencies</label>
+        <FrequencyMeter />
+      </div>
     </div>
     <br />
   </div>
@@ -45,10 +50,11 @@
 import Rainbow from 'rainbowvis.js'
 import _ from 'lodash'
 import { eventService } from '@/services/EventService'
+import FrequencyMeter from './FrequencyMeter.vue';
 
 export default {
   name: "RecordingMetrics",
-  components: { },
+  components: { FrequencyMeter },
   data() {
     return {
       rms: 0.0,
