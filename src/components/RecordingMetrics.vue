@@ -36,12 +36,11 @@
       <div class="col-md-6">
         <p>Track Time: {{getTrackTime()}}</p>
       </div>
-
-      <div class="col-md-12">
-        <label>Frequencies</label>
+    </div>
+    <div>
+        <label>Spectrum</label>
         <FrequencyMeter />
       </div>
-    </div>
     <br />
   </div>
 </template>
