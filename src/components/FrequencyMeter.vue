@@ -1,31 +1,6 @@
 <template>
-  <div>
-    <div class="row level-meters">
-      <div class="col-md-12">
-        <label>Bass</label>
-        <b-progress :max="frequencySum">
-          <b-progress-bar
-            :value="bass"
-          ></b-progress-bar>
-        </b-progress>
-      </div>
-      <div class="col-md-12">
-        <label>Midrange</label>
-        <b-progress :max="frequencySum">
-          <b-progress-bar
-            :value="midrange"
-          ></b-progress-bar>
-        </b-progress>
-      </div>
-      <div class="col-md-12">
-        <label>Treble</label>
-        <b-progress :max="frequencySum">
-          <b-progress-bar
-            :value="treble"
-          ></b-progress-bar>
-        </b-progress>
-      </div>
-    </div>
+  <div class="equalizer-container">
+    <label>Spectrum</label>
     <div ref="equalizer">
       <vue-bar-graph
         :points="frequencies"
@@ -61,7 +36,7 @@ export default {
 
     eventService.metrics().frequencies((frequencies) => {
       // Add a small offset such that the bars are never fully empty
-      this.frequencies = _.map(frequencies, (f) => f + 0.5);
+      this.frequencies = _.map(frequencies, (f) => f + 0.1);
     });
   },
   unmounted() {
@@ -83,34 +58,7 @@ export default {
       return `#${rainbow.colorAt(avgFrequencyLevel)}`;
     },
     frequencySum() {
-      return _.sum(this.frequencies)
-    },
-    bass() {
-      const count = _.size(this.frequencies);
-      if (count == 0) {
-        return 0;
-      }
-      return (
-        _.sum(_.slice(this.frequencies, 0, _.round(count / 3)))
-      );
-    },
-    midrange() {
-      const count = _.size(this.frequencies);
-      if (count == 0) {
-        return 0;
-      }
-      return (
-        _.sum(_.slice(this.frequencies, _.round(count / 3), _.round(count / 3)*2))
-      );
-    },
-    treble() {
-      const count = _.size(this.frequencies);
-      if (count == 0) {
-        return 0;
-      }
-      return (
-        _.sum(_.slice(this.frequencies, _.round(count / 3)*2))
-      );
+      return _.sum(this.frequencies);
     }
   },
   methods: {
@@ -123,7 +71,7 @@ export default {
 </script>
 
 <style scoped>
-.level-meters {
-  margin-bottom: 30px;
+.equalizer-container {
+  margin-top: 30px;
 }
 </style>
