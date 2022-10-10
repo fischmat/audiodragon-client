@@ -1,5 +1,7 @@
 <template>
   <div id="track">
+    <FrequencyMeter id="frequency-meter" />
+
     <div class="row metrics-container">
       <div class="col-md-12">
         <label>RMS</label>
@@ -52,8 +54,6 @@
         <p>Track Time: {{ getTrackTime() }}</p>
       </div>
     </div>
-    
-    <FrequencyMeter />
   </div>
 </template>
 
@@ -137,6 +137,11 @@ export default {
 </script>
 
 <style scoped>
+#frequency-meter {
+  transform: rotate(180deg) scaleX(-1);
+  margin-bottom: 70px;
+}
+
 .metrics-container {
   margin: 0 auto;
 }

@@ -26,6 +26,6 @@ export default {
 }
 
 #recording-metrics {
-  margin-top: 70px;
+  margin-top: 10px;
 }
 </style>

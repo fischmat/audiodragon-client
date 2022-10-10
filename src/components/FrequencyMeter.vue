@@ -1,6 +1,5 @@
 <template>
-  <div class="equalizer-container">
-    <label>Spectrum</label>
+  <div>
     <div ref="equalizer">
       <vue-bar-graph
         :points="frequencies"
@@ -73,7 +72,4 @@ export default {
 </script>
 
 <style scoped>
-.equalizer-container {
-  margin-top: 30px;
-}
 </style>
