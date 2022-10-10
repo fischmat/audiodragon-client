@@ -17,6 +17,7 @@ import VueBarGraph from "vue-bar-graph";
 import { eventService } from "@/services/EventService";
 import _ from "lodash";
 import Rainbow from "rainbowvis.js";
+import { getThemeState } from '@/stores/ThemeState'
 
 export default {
   components: {
@@ -28,6 +29,7 @@ export default {
       width: 100,
       height: 100,
       frequencies: [],
+      themeState: getThemeState()
     };
   },
   mounted() {
@@ -54,7 +56,7 @@ export default {
       );
       const rainbow = new Rainbow();
       rainbow.setNumberRange(0, count);
-      rainbow.setSpectrum("#ff0023", "#c4b90b", "#20e218");
+      rainbow.setSpectrum(this.themeState.vibrant || "#ff0023", this.themeState.lightVibrant || "#c4b90b", this.themeState.darkVibrant || "#20e218");
       return `#${rainbow.colorAt(avgFrequencyLevel)}`;
     },
     frequencySum() {

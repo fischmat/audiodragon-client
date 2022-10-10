@@ -16,7 +16,7 @@
         <label class="buffer-stats"
           >{{ toHumanReadableMemorySize(bufferStats.size) }} /
           {{ toHumanReadableMemorySize(bufferStats.maxMemory) }}
-          <b-badge class="buffer-badge">In-Memory</b-badge></label
+          <b-badge class="buffer-badge" :style="{ backgroundColor: themeState.vibrant }">In-Memory</b-badge></label
         >
         <b-progress :max="bufferStats.maxMemory">
           <b-progress-bar
@@ -34,7 +34,7 @@
         <label class="buffer-stats"
           >Buffer size: {{ toHumanReadableMemorySize(bufferStats.size) }} /
           {{ toHumanReadableMemorySize(bufferStats.freeDiskSpace) }} on disk
-          <b-badge class="buffer-badge">Hybrid buffering</b-badge></label
+          <b-badge class="buffer-badge" :style="{ backgroundColor: themeState.vibrant }">Hybrid buffering</b-badge></label
         >
         <b-progress :max="bufferStats.maxMemory">
           <b-progress-bar
@@ -62,6 +62,7 @@ import Rainbow from "rainbowvis.js";
 import _ from "lodash";
 import { eventService } from "@/services/EventService";
 import FrequencyMeter from "./FrequencyMeter.vue";
+import { getThemeState } from '@/stores/ThemeState'
 
 export default {
   name: "RecordingMetrics",
@@ -71,6 +72,7 @@ export default {
       rms: 0.0,
       trackTime: 0,
       bufferStats: {},
+      themeState: getThemeState()
     };
   },
   mounted() {
@@ -127,7 +129,7 @@ export default {
     getMeterColor(value, min, max) {
       const rainbow = new Rainbow();
       rainbow.setNumberRange(min, max);
-      rainbow.setSpectrum("#20e218", "#c4b90b", "#ff0023");
+      rainbow.setSpectrum(this.themeState.vibrant || "#20e218", this.themeState.lightVibrant || "#c4b90b", this.themeState.darkVibrant || "#ff0023");
       return `#${rainbow.colorAt(value)}`;
     },
   },

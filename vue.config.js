@@ -7,4 +7,14 @@ module.exports = defineConfig({
 		port: 3000,
 		https: false,
   },
+  configureWebpack: {
+    module: {
+      rules: [
+        {
+          test: /\.worker\.js$/,
+          use: { loader: "worker-loader" }
+        }
+      ]
+    }
+  }
 })

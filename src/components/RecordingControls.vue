@@ -25,6 +25,7 @@
       :hidden="!isRecording && !terminationPending"
       :disabled="terminationPending"
       variant="danger"
+      :style="stopRecordingStyle"
       >Stop after track</b-button
     >
     <b-button
@@ -32,6 +33,7 @@
       @click="stopRecording(false)"
       :hidden="!isRecording"
       variant="danger"
+      :style="stopRecordingStyle"
       >Stop</b-button
     >
     <div v-if="terminationPending">
@@ -44,6 +46,7 @@
 import { getRecordingState } from '../stores/RecordingState'
 import { captureService } from '../services/CaptureService'
 import { eventService } from '@/services/EventService'
+import { getThemeState } from '@/stores/ThemeState'
 
 var recordingState = null
 
@@ -57,6 +60,7 @@ export default {
       currentCapture: null,
       recognizeSongs: true,
       terminationPending: false,
+      themeState: getThemeState()
     };
   },
   computed: {
@@ -65,6 +69,12 @@ export default {
     },
     isRecording() {
       return this.currentCapture != null
+    },
+    stopRecordingStyle() {
+      if (this.themeState.vibrant) {
+        return { backgroundColor: this.themeState.vibrant, borderColor: this.themeState.darkVibrant }
+      }
+      return {}
     }
   },
   mounted() {

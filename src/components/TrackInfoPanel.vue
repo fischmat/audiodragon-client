@@ -81,6 +81,8 @@ import { eventService } from '@/services/EventService'
 import { getRecordingState } from '../stores/RecordingState'
 import { captureService } from '../services/CaptureService'
 import _ from "lodash"
+import * as Vibrant from "node-vibrant";
+import { getThemeState } from '@/stores/ThemeState'
 
 const EMPTY_TRACK = {
   title: "",
@@ -99,12 +101,14 @@ export default {
       track: _.cloneDeep(EMPTY_TRACK),
       emptyTrackImage: require("../assets/notrack.png"),
       isRecording: false,
-      recordingState: getRecordingState()
+      recordingState: getRecordingState(),
+      themeState: getThemeState()
     };
   },
   mounted() {
     eventService.track().onRecognized((event) => {
       this.track = event.track
+      this.updateThemeFromImage(event.track.coverartImageUrl)
     })
     eventService.track().onEnded(() => {
       this.track = _.cloneDeep(EMPTY_TRACK)
@@ -127,7 +131,22 @@ export default {
     getTrackData(audioSourceId) {
       captureService.getCurrentTrack(audioSourceId).then((track) => {
         this.track = track ? track : EMPTY_TRACK;
+        this.updateThemeFromImage(track.coverartImageUrl)
       });
+    },
+    updateThemeFromImage(imageUrl) {
+      if (imageUrl) {
+        Vibrant.from(imageUrl)
+          .getPalette()
+          .then((palette) => {
+            this.themeState.muted = palette.Muted.getHex();
+            this.themeState.vibrant = palette.Vibrant.getHex();
+            this.themeState.lightVibrant = palette.LightVibrant.getHex();
+            this.themeState.lightMuted = palette.LightMuted.getHex();
+            this.themeState.darkVibrant = palette.DarkVibrant.getHex();
+            this.themeState.darkMuted = palette.DarkMuted.getHex();
+          });
+      }
     }
   },
   watch: {
