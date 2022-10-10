@@ -10,8 +10,6 @@ Vue.use(FormSelectPlugin)
 Vue.use(BootstrapVue)
 Vue.use(VueKonva)
 
-import './app.css'
-
 Vue.use(PiniaVuePlugin)
 const pinia = createPinia()
 Vue.use(VueCompositionAPI)

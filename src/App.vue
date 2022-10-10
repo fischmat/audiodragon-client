@@ -55,5 +55,13 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+@import "~@/assets/scss/vendors/bootstrap-vue/theme.scss";
+@import 'node_modules/bootstrap/scss/bootstrap.scss';
+@import 'node_modules/bootstrap-vue/src/index.scss';
+
+body {
+  background: linear-gradient(180deg, rgba(96,1,3,1) 0%, rgba(25,25,25,1) 59%);
+  height: 100vh;
+}
 </style>
