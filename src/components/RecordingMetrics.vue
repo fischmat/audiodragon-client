@@ -140,7 +140,7 @@ export default {
 #frequency-meter {
   transform: rotate(180deg) scaleX(-1);
   margin-bottom: 70px;
-  filter: opacity(40%);
+  filter: opacity(20%);
 }
 
 .metrics-container {
