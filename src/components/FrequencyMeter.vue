@@ -35,6 +35,9 @@ export default {
     this.handleResize();
     window.addEventListener("resize", this.handleResize);
 
+    eventService.capture().onEnded(() => {
+      this.frequencies = _.map(this.frequencies, () => 0.1)
+    })
     eventService.metrics().frequencies((frequencies) => {
       // Add a small offset such that the bars are never fully empty
       this.frequencies = _.map(frequencies, (f) => f + 0.1);
