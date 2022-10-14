@@ -18,7 +18,13 @@
         <label class="buffer-stats"
           >{{ toHumanReadableMemorySize(bufferStats.size) }} /
           {{ toHumanReadableMemorySize(bufferStats.maxMemory) }}
-          <b-badge class="buffer-badge" :style="{ backgroundColor: themeState.vibrant }">In-Memory</b-badge></label
+          <b-badge
+            class="buffer-badge"
+            :style="{ backgroundColor: themeState.vibrant }"
+            v-b-tooltip.hover
+            title="Audio signal is recorded in-memory. The recording size is limited by the maximum heap space available to the JVM."
+            >In-Memory</b-badge
+          ></label
         >
         <b-progress :max="bufferStats.maxMemory">
           <b-progress-bar
@@ -36,7 +42,13 @@
         <label class="buffer-stats"
           >Buffer size: {{ toHumanReadableMemorySize(bufferStats.size) }} /
           {{ toHumanReadableMemorySize(bufferStats.freeDiskSpace) }} on disk
-          <b-badge class="buffer-badge" :style="{ backgroundColor: themeState.vibrant }">Hybrid buffering</b-badge></label
+          <b-badge
+            class="buffer-badge"
+            :style="{ backgroundColor: themeState.vibrant }"
+            v-b-tooltip.hover
+            title="Audio signal is recorded in-memory and spilled to disk when a certain threshold is reached to prevent excessive memory usage."
+            >Hybrid buffering</b-badge
+          ></label
         >
         <b-progress :max="bufferStats.maxMemory">
           <b-progress-bar
@@ -51,7 +63,10 @@
       </div>
 
       <div class="col-md-6">
-        <p>Track Time: {{ getTrackTime(trackTime) }} <span v-if="trackLength">/ {{trackLength}}</span></p>
+        <p>
+          Track Time: {{ getTrackTime(trackTime) }}
+          <span v-if="trackLength">/ {{ trackLength }}</span>
+        </p>
       </div>
     </div>
   </div>
@@ -62,8 +77,8 @@ import Rainbow from "rainbowvis.js";
 import _ from "lodash";
 import { eventService } from "@/services/EventService";
 import FrequencyMeter from "./FrequencyMeter.vue";
-import { getRecordingState } from '../stores/RecordingState'
-import { getThemeState } from '@/stores/ThemeState'
+import { getRecordingState } from "../stores/RecordingState";
+import { getThemeState } from "@/stores/ThemeState";
 
 export default {
   name: "RecordingMetrics",
@@ -74,7 +89,7 @@ export default {
       trackTime: 0,
       trackLengthMillis: 0,
       bufferStats: {},
-      themeState: getThemeState()
+      themeState: getThemeState(),
     };
   },
   mounted() {
@@ -94,8 +109,8 @@ export default {
     });
 
     getRecordingState().$subscribe((_, state) => {
-      this.trackLengthMillis = state.currentTrack?.lengthMillis
-    })
+      this.trackLengthMillis = state.currentTrack?.lengthMillis;
+    });
   },
   methods: {
     toHumanReadableMemorySize(sizeInBytes) {
@@ -135,18 +150,22 @@ export default {
     getMeterColor(value, min, max) {
       const rainbow = new Rainbow();
       rainbow.setNumberRange(min, max);
-      rainbow.setSpectrum(this.themeState.vibrant || "#20e218", this.themeState.lightVibrant || "#c4b90b", this.themeState.darkVibrant || "#ff0023");
+      rainbow.setSpectrum(
+        this.themeState.vibrant || "#20e218",
+        this.themeState.lightVibrant || "#c4b90b",
+        this.themeState.darkVibrant || "#ff0023"
+      );
       return `#${rainbow.colorAt(value)}`;
     },
   },
   computed: {
     trackLength() {
       if (!this.trackLengthMillis) {
-        return null
+        return null;
       }
-      return this.getTrackTime(this.trackLengthMillis)
-    }
-  }
+      return this.getTrackTime(this.trackLengthMillis);
+    },
+  },
 };
 </script>
 
