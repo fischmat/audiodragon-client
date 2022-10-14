@@ -154,6 +154,9 @@ export default {
     track: {
       handler(track) {
         captureService.updateCurrentTrack(track, this.recordingState.audioSource.id)
+        if (track.coverartImageUrl) {
+          this.updateThemeFromImage(track.coverartImageUrl)
+        }
       },
       deep: true
     }
