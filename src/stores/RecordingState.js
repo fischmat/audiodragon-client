@@ -5,6 +5,7 @@ export const getRecordingState = defineStore('recording', {
         audioSource: null,
         audioFormat: null,
         outputFormat: null,
-        currentCapture: null
+        currentCapture: null,
+        currentTrack: null
     })
 })

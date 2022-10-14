@@ -131,6 +131,7 @@ export default {
     getTrackData(audioSourceId) {
       captureService.getCurrentTrack(audioSourceId).then((track) => {
         this.track = track ? track : EMPTY_TRACK;
+        this.recordingState.currentTrack = track;
         this.updateThemeFromImage(track.coverartImageUrl)
       });
     },

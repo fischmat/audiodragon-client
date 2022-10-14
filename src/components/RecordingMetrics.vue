@@ -51,7 +51,7 @@
       </div>
 
       <div class="col-md-6">
-        <p>Track Time: {{ getTrackTime() }}</p>
+        <p>Track Time: {{ getTrackTime(trackTime) }} <span v-if="trackLength">/ {{trackLength}}</span></p>
       </div>
     </div>
   </div>
@@ -62,6 +62,7 @@ import Rainbow from "rainbowvis.js";
 import _ from "lodash";
 import { eventService } from "@/services/EventService";
 import FrequencyMeter from "./FrequencyMeter.vue";
+import { getRecordingState } from '../stores/RecordingState'
 import { getThemeState } from '@/stores/ThemeState'
 
 export default {
@@ -71,6 +72,7 @@ export default {
     return {
       rms: 0.0,
       trackTime: 0,
+      trackLengthMillis: 0,
       bufferStats: {},
       themeState: getThemeState()
     };
@@ -90,6 +92,10 @@ export default {
       this.trackTime = 0;
       this.bufferStats = {};
     });
+
+    getRecordingState().$subscribe((_, state) => {
+      this.trackLengthMillis = state.currentTrack?.lengthMillis
+    })
   },
   methods: {
     toHumanReadableMemorySize(sizeInBytes) {
@@ -104,13 +110,13 @@ export default {
       }
     },
 
-    getTrackTime() {
-      if (!this.trackTime) {
+    getTrackTime(timeMillis) {
+      if (!timeMillis) {
         return "N/A";
       }
-      const minutes = Math.floor(this.trackTime / 60000);
-      const seconds = Math.floor((this.trackTime % 60000) / 1000);
-      const millis = this.trackTime % 1000;
+      const minutes = Math.floor(timeMillis / 60000);
+      const seconds = Math.floor((timeMillis % 60000) / 1000);
+      const millis = timeMillis % 1000;
       return `${this.pad(minutes)}:${this.pad(seconds)}.${this.pad(millis, 3)}`;
     },
 
@@ -133,6 +139,14 @@ export default {
       return `#${rainbow.colorAt(value)}`;
     },
   },
+  computed: {
+    trackLength() {
+      if (!this.trackLengthMillis) {
+        return null
+      }
+      return this.getTrackTime(this.trackLengthMillis)
+    }
+  }
 };
 </script>
 
