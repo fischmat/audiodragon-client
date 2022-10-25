@@ -2,73 +2,7 @@
   <div id="track">
     <FrequencyMeter id="frequency-meter" />
 
-    <div class="row metrics-container">
-      <div class="col-md-12">
-        <label>RMS</label>
-        <b-progress :max="1">
-          <b-progress-bar
-            v-bind:style="getMeterStyle(rms, 0.0, 1.0)"
-            :value="rms"
-            :label="`${(rms * 1000).toFixed(2)} ×10⁻³`"
-          ></b-progress-bar>
-        </b-progress>
-      </div>
-
-      <div class="col-md-12" v-if="bufferStats.type == 'inMemory'">
-        <label class="buffer-stats"
-          >{{ toHumanReadableMemorySize(bufferStats.size) }} /
-          {{ toHumanReadableMemorySize(bufferStats.maxMemory) }}
-          <b-badge
-            class="buffer-badge"
-            :style="{ backgroundColor: themeState.vibrant }"
-            v-b-tooltip.hover
-            title="Audio signal is recorded in-memory. The recording size is limited by the maximum heap space available to the JVM."
-            >In-Memory</b-badge
-          ></label
-        >
-        <b-progress :max="bufferStats.maxMemory">
-          <b-progress-bar
-            v-bind:style="
-              getMeterStyle(bufferStats.size, 0, bufferStats.maxMemory)
-            "
-            :value="bufferStats.size"
-            :label="toHumanReadableMemorySize(bufferStats.size)"
-          ></b-progress-bar>
-        </b-progress>
-        <br />
-      </div>
-
-      <div class="col-md-12" v-if="bufferStats.type == 'diskSpilling'">
-        <label class="buffer-stats"
-          >Buffer size: {{ toHumanReadableMemorySize(bufferStats.size) }} /
-          {{ toHumanReadableMemorySize(bufferStats.freeDiskSpace) }} on disk
-          <b-badge
-            class="buffer-badge"
-            :style="{ backgroundColor: themeState.vibrant }"
-            v-b-tooltip.hover
-            title="Audio signal is recorded in-memory and spilled to disk when a certain threshold is reached to prevent excessive memory usage."
-            >Hybrid buffering</b-badge
-          ></label
-        >
-        <b-progress :max="bufferStats.maxMemory">
-          <b-progress-bar
-            v-bind:style="
-              getMeterStyle(bufferStats.size, 0, bufferStats.freeDiskSpace)
-            "
-            :value="bufferStats.size"
-            :label="toHumanReadableMemorySize(bufferStats.size)"
-          ></b-progress-bar>
-        </b-progress>
-        <br />
-      </div>
-
-      <div class="col-md-6">
-        <p>
-          Track Time: {{ getTrackTime(trackTime) }}
-          <span v-if="trackLength">/ {{ trackLength }}</span>
-        </p>
-      </div>
-    </div>
+    <LibraryList />
   </div>
 </template>
 
@@ -79,10 +13,11 @@ import { eventService } from "@/services/EventService";
 import FrequencyMeter from "./FrequencyMeter.vue";
 import { getRecordingState } from "../stores/RecordingState";
 import { getThemeState } from "@/stores/ThemeState";
+import LibraryList from "./library-list/LibraryList";
 
 export default {
   name: "RecordingMetrics",
-  components: { FrequencyMeter },
+  components: { FrequencyMeter, LibraryList },
   data() {
     return {
       rms: 0.0,
@@ -172,7 +107,6 @@ export default {
 <style scoped>
 #frequency-meter {
   transform: rotate(180deg) scaleX(-1);
-  margin-bottom: 70px;
   filter: opacity(20%);
 }
 

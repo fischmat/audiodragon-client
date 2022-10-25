@@ -20,10 +20,14 @@ const EVENT_ID_METRICS_RMS = 'metrics_rms'
 const EVENT_ID_METRICS_FREQUENCIES = 'metrics_frequencies'
 const EVENT_ID_METRICS_TRACK_TIME = 'metrics_track_time'
 const EVENT_ID_METRICS_BUFFER_STATS = 'metrics_buffer_stats'
+// Library
+const EVENT_ID_LIBRARY_INIT = 'libraryInit'
+const EVENT_ID_LIBRARY_REFRESHED = 'libraryRefreshed'
 
 // Prefixes
 const WS_TOPIC_CAPTURE = '/capture'
 const WS_TOPIC_METRICS = '/metrics'
+const WS_TOPIC_LIBRARY = '/library'
 
 export const eventService = {
     
@@ -51,6 +55,10 @@ export const eventService = {
                     PubSub.publish(EVENT_ID_METRICS_FREQUENCIES, event.frequencies)
                     PubSub.publish(EVENT_ID_METRICS_BUFFER_STATS, event.buffer)
                     PubSub.publish(EVENT_ID_METRICS_TRACK_TIME, event.trackTime)
+                })
+                stompClient.subscribe(WS_TOPIC_LIBRARY, (tick) => {
+                    const event = JSON.parse(tick.body)
+                    PubSub.publish(event.type, event)
                 })
             },
             (error) => {
@@ -101,6 +109,17 @@ export const eventService = {
             trackTime(callback) {
                 PubSub.subscribe(EVENT_ID_METRICS_TRACK_TIME, (_, evt) => callback(evt))
             },
+        }
+    },
+
+    library() {
+        return {
+            initialized(callback) {
+                PubSub.subscribe(EVENT_ID_LIBRARY_INIT, (_, evt) => callback(evt))
+            },
+            refreshed(callback) {
+                PubSub.subscribe(EVENT_ID_LIBRARY_REFRESHED, (_, evt) => callback(evt))
+            }
         }
     },
 

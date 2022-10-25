@@ -68,7 +68,7 @@ export default {
   methods: {
     handleResize() {
       this.width = this.$refs.equalizer.clientWidth;
-      this.height = Math.max(this.$refs.equalizer.clientHeight, 300);
+      this.height = Math.max(this.$refs.equalizer.clientHeight, 150);
     },
   },
 };
