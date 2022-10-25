@@ -15,19 +15,25 @@
             <span v-for="genre in item.genres" v-bind:key="genre" class="info-label">{{genre}}</span>
         </b-col>
         <b-col>
-            <span v-if="synced"><img class="sync-state" src="@/assets/sd_sync_ok.png" alt="Synchronize" /> Synchronized</span>
-            <span v-if="!synced"><img class="sync-state" src="@/assets/sd_sync.png" alt="Not synchronized" /> Not synchronized</span>
+            <span>{{updatedAt}}</span>
         </b-col>
     </b-row>
 </template>
   
   <script>
+import moment from 'moment';
+
 export default {
   components: {},
   name: "LibraryItem",
-  props: ["item", "synced"],
+  props: ["item"],
   data() {
     return {}
+  },
+  computed: {
+    updatedAt() {
+        return moment(this.item.updatedAt).fromNow()
+    }
   }
 };
 </script>

@@ -1,35 +1,51 @@
 <template>
   <div>
+    <b-row class="lib-list-header">
+      <b-col> </b-col>
+      <b-col>
+        <ColumnHeader
+          title="Title"
+          apiField="TITLE"
+          apiFilterKey="title"
+          :model="options"
+          :sortable="true"
+          :filterable="true"
+          @change="resetSearch"
+        />
+      </b-col>
+      <b-col>
+        <ColumnHeader
+          title="Album"
+          apiField="ALBUM"
+          apiFilterKey="album"
+          :model="options"
+          :sortable="true"
+          :filterable="true"
+          @change="resetSearch"
+        />
+      </b-col>
+      <b-col>
+        <ColumnHeader
+          title="Genres"
+          apiFilterKey="genre"
+          :model="options"
+          :filterable="true"
+          @change="resetSearch"
+        />
+      </b-col>
+      <b-col>
+        <ColumnHeader
+          title="Updated"
+          apiField="UPDATED_AT"
+          :model="options"
+          :sortable="true"
+          @change="resetSearch"
+        />
+      </b-col>
+    </b-row>
     <div id="lib-list" class="lib-list">
-      <b-row class="lib-list-header">
-        <b-col> </b-col>
-        <b-col>
-          <ColumnHeader
-            title="Title"
-            :sortable="true"
-            @change="(so) => resetSearch('TITLE', so)"
-          />
-        </b-col>
-        <b-col>
-          <ColumnHeader
-            title="Album"
-            :sortable="true"
-            @change="(so) => resetSearch('ALBUM', so)"
-          />
-        </b-col>
-        <b-col>
-          <ColumnHeader title="Genres" :sortable="false" />
-        </b-col>
-        <b-col>
-          <ColumnHeader
-            title="Added"
-            :sortable="true"
-            @change="(so) => resetSearch('UPDATED_AT', so)"
-          />
-        </b-col>
-      </b-row>
       <div v-for="item in items" v-bind:key="item.filePath">
-        <LibraryItem :item="item" :synced="false" />
+        <LibraryItem :item="item" />
       </div>
     </div>
   </div>
@@ -49,8 +65,11 @@ export default {
       items: [],
       page: 0,
       loading: false,
-      sortBy: 'UPDATED_AT',
-      sortOrder: 'DESC',
+      options: {
+        sortBy: "UPDATED_AT",
+        sortOrder: "DESC",
+        filters: [],
+      },
     };
   },
 
@@ -77,7 +96,13 @@ export default {
     loadNextPage(reset = false) {
       this.page += 1;
       libraryService
-        .getItems(this.page, 20, this.sortBy, this.sortOrder)
+        .getItems(
+          this.page,
+          20,
+          this.options.sortBy,
+          this.options.sortOrder,
+          this.options.filters
+        )
         .then((items) => {
           if (reset) {
             this.page = 1;
@@ -88,13 +113,13 @@ export default {
         });
     },
 
-    resetSearch(field, params) {
-      if (params.sort) {
-        this.sortBy = field;
-        this.sortOrder = params.sort;
-      } else if (params.sort === null) {
-        this.sortBy = 'UPDATED_AT';
-        this.sortOrder = 'DESC';
+    resetSearch(options) {
+      this.options = options;
+      console.log(options);
+
+      if (!this.options.sortOrder) {
+        this.sortBy = "UPDATED_AT";
+        this.sortOrder = "DESC";
       }
       this.page = 0;
 
@@ -106,7 +131,7 @@ export default {
   
 <style scoped>
 .lib-list {
-  max-height: 600px;
+  max-height: 500px;
   overflow-y: scroll;
 }
 .lib-list-header {

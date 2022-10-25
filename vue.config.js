@@ -8,6 +8,7 @@ module.exports = defineConfig({
 		https: false,
   },
   configureWebpack: {
+    devtool: 'source-map',
     module: {
       rules: [
         {
