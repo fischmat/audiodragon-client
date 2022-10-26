@@ -36,6 +36,13 @@ export default {
     eventService.capture().onEnded(() => {
       recordingState.currentCapture = null;
     });
+    eventService.track().onWritten((e) => {
+      this.$bvToast.toast(`Track written to ${e.path}`, {
+          title: 'File written',
+          autoHideDelay: 5000,
+          appendToast: true,
+      });
+    })
 
     recordingState.$subscribe((_, state) => {
       this.persistState(state);

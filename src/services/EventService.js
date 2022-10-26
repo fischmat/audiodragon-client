@@ -15,6 +15,7 @@ const EVENT_ID_CAPTURE_END_REQUESTED = 'captureEndRequested'
 const EVENT_ID_TRACK_STARTED = 'trackStarted'
 const EVENT_ID_TRACK_ENDED = 'trackEnded'
 const EVENT_ID_TRACK_RECOGNIZED = 'trackRecognized'
+const EVENT_ID_TRACK_WRITTEN = 'trackWritten'
 // Metrics
 const EVENT_ID_METRICS_RMS = 'metrics_rms'
 const EVENT_ID_METRICS_FREQUENCIES = 'metrics_frequencies'
@@ -91,6 +92,9 @@ export const eventService = {
             },
             onRecognized(callback) {
                 PubSub.subscribe(EVENT_ID_TRACK_RECOGNIZED, (_, evt) => callback(evt))
+            },
+            onWritten(callback) {
+                PubSub.subscribe(EVENT_ID_TRACK_WRITTEN, (_, evt) => callback(evt))
             }
         }
     },
