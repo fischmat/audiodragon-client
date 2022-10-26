@@ -105,11 +105,6 @@ export default {
 </script>
 
 <style scoped>
-#frequency-meter {
-  transform: rotate(180deg) scaleX(-1);
-  filter: opacity(20%);
-}
-
 .metrics-container {
   margin: 0 auto;
 }
