@@ -1,7 +1,12 @@
 <template>
   <div>
     <b-row class="lib-list-header">
-      <b-col> </b-col>
+      <b-col>
+        <b-icon-search id="search-icon" />  
+        <b-popover :target="`search-icon`" triggers="click" placement="right">
+          <b-input id="search-input" v-model="options.search" placeholder="Search..." :autofocus="true" @input="resetSearch(options)" />
+        </b-popover>
+      </b-col>
       <b-col>
         <ColumnHeader
           title="Title"
@@ -43,11 +48,13 @@
         />
       </b-col>
     </b-row>
-    <div id="lib-list" class="lib-list">
-      <div v-for="item in items" v-bind:key="item.filePath">
-        <LibraryItem :item="item" />
+    <b-overlay :show="loading" rounded="sm" variant="transparent">
+      <div id="lib-list" class="lib-list">
+        <div v-for="item in items" v-bind:key="item.filePath">
+          <LibraryItem :item="item" />
+        </div>
       </div>
-    </div>
+    </b-overlay>
   </div>
 </template>
   
@@ -90,13 +97,19 @@ export default {
       this.page = 0;
       this.loadNextPage(true);
     });
+    eventService.track().onWritten(() => {
+      this.page = 0;
+      this.loadNextPage(true);
+    })
   },
 
   methods: {
     loadNextPage(reset = false) {
       this.page += 1;
+      this.loading = true;
       libraryService
         .getItems(
+          this.options.search,
           this.page,
           20,
           this.options.sortBy,
@@ -104,6 +117,7 @@ export default {
           this.options.filters
         )
         .then((items) => {
+          this.loading = false;
           if (reset) {
             this.page = 1;
             this.items = items;
@@ -122,7 +136,6 @@ export default {
         this.sortOrder = "DESC";
       }
       this.page = 0;
-
       this.loadNextPage(true);
     },
   },
@@ -132,11 +145,17 @@ export default {
 <style scoped>
 .lib-list {
   max-height: 500px;
+  min-height: 200px;
   overflow-y: scroll;
 }
 .lib-list-header {
   padding: 10px;
   margin: 10px;
   font-weight: bold;
+}
+
+#search-input:focus {
+  border-color: unset;
+  box-shadow: unset;
 }
 </style>
