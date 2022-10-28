@@ -59,8 +59,8 @@ export default {
     eventService.metrics().trackTime((t) => {
       this.trackTime = t;
     });
-    eventService.track().onRecognized((track) => {
-      this.trackLength = track.lengthMillis;
+    eventService.track().onRecognized((evt) => {
+      this.trackLength = evt.track?.lengthMillis;
     });
     eventService.track().onEnded(() => {
       this.trackTime = 0;

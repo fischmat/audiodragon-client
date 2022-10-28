@@ -77,12 +77,12 @@
 </template>
 
 <script>
-import { eventService } from '@/services/EventService'
-import { getRecordingState } from '../stores/RecordingState'
-import { captureService } from '../services/CaptureService'
-import _ from "lodash"
+import { eventService } from "@/services/EventService";
+import { getRecordingState } from "../stores/RecordingState";
+import { captureService } from "../services/CaptureService";
+import _ from "lodash";
 import * as Vibrant from "node-vibrant";
-import { getThemeState } from '@/stores/ThemeState'
+import { getThemeState } from "@/stores/ThemeState";
 
 const EMPTY_TRACK = {
   title: "",
@@ -92,6 +92,7 @@ const EMPTY_TRACK = {
   releaseYear: null,
   labels: [],
   coverartImageUrl: null,
+  audioSourceId: null,
 };
 
 export default {
@@ -102,37 +103,40 @@ export default {
       emptyTrackImage: require("../assets/notrack.png"),
       isRecording: false,
       recordingState: getRecordingState(),
-      themeState: getThemeState()
+      themeState: getThemeState(),
     };
   },
   mounted() {
     eventService.track().onRecognized((event) => {
-      this.track = event.track
-      this.updateThemeFromImage(event.track.coverartImageUrl)
-    })
+      this.track = event.track;
+      this.updateThemeFromImage(event.track.coverartImageUrl);
+    });
     eventService.track().onEnded(() => {
-      this.track = _.cloneDeep(EMPTY_TRACK)
-    })
+      this.track = _.cloneDeep(EMPTY_TRACK);
+    });
     eventService.track().onStarted(() => {
-      this.track = _.cloneDeep(EMPTY_TRACK)
-    })
+      _.assign(this.track, EMPTY_TRACK);
+    });
 
     if (this.recordingState.audioSource) {
-      this.getTrackData(this.recordingState.audioSource.id)
+      this.getTrackData(this.recordingState.audioSource.id);
     }
 
-    this.isRecording = !!this.recordingState.currentCapture
+    this.isRecording = !!this.recordingState.currentCapture;
     this.recordingState.$subscribe((_, state) => {
-      this.getTrackData(state.audioSource.id)
-      this.isRecording = !!state.currentCapture
-    })
+      if (state.audioSource.id != this.audioSourceId) {
+        this.audioSourceId = state.audioSource.id;
+        this.getTrackData(state.audioSource.id);
+      }
+      this.isRecording = !!state.currentCapture;
+    });
   },
   methods: {
     getTrackData(audioSourceId) {
       captureService.getCurrentTrack(audioSourceId).then((track) => {
         this.track = track ? track : EMPTY_TRACK;
         this.recordingState.currentTrack = track;
-        this.updateThemeFromImage(track.coverartImageUrl)
+        this.updateThemeFromImage(track.coverartImageUrl);
       });
     },
     updateThemeFromImage(imageUrl) {
@@ -148,19 +152,22 @@ export default {
             this.themeState.darkMuted = palette.DarkMuted.getHex();
           });
       }
-    }
+    },
   },
   watch: {
     track: {
       handler(track) {
-        captureService.updateCurrentTrack(track, this.recordingState.audioSource.id)
+        captureService.updateCurrentTrack(
+          track,
+          this.recordingState.audioSource.id
+        );
         if (track.coverartImageUrl) {
-          this.updateThemeFromImage(track.coverartImageUrl)
+          this.updateThemeFromImage(track.coverartImageUrl);
         }
       },
-      deep: true
-    }
-  }
+      deep: true,
+    },
+  },
 };
 </script>
 
