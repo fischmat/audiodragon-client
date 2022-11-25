@@ -16,18 +16,21 @@ import { getThemeState } from "@/stores/ThemeState";
 
 export default {
   name: "App",
+  metaInfo: {
+    title: "Audio Dragon"
+  },
   components: {
     RecordingSidebar,
     RecordingContentPane,
   },
   data() {
     return {
-      backgroundClass: {}
-    }
+      backgroundClass: {},
+    };
   },
   mounted() {
     const recordingState = this.loadState();
-    const themeState = getThemeState()
+    const themeState = getThemeState();
     eventService.connect();
 
     eventService.capture().onStarted((event) => {
@@ -38,20 +41,22 @@ export default {
     });
     eventService.track().onWritten((e) => {
       this.$bvToast.toast(`Track written to ${e.path}`, {
-          title: 'File written',
-          autoHideDelay: 5000,
-          appendToast: true,
+        title: "File written",
+        autoHideDelay: 5000,
+        appendToast: true,
       });
-    })
+    });
 
     recordingState.$subscribe((_, state) => {
       this.persistState(state);
     });
     themeState.$subscribe((_, state) => {
       if (state.darkMuted) {
-        this.backgroundClass = { background: `linear-gradient(180deg, ${state.darkMuted} 0%, #141414 59%)` }
+        this.backgroundClass = {
+          background: `linear-gradient(180deg, ${state.darkMuted} 0%, #141414 59%)`,
+        };
       }
-    })
+    });
   },
 
   methods: {
@@ -72,8 +77,8 @@ export default {
       localStorage.audioSource = JSON.stringify(state.audioSource);
       localStorage.audioFormatId = JSON.stringify(state.audioFormat);
       localStorage.outputFormat = JSON.stringify(state.outputFormat);
-    }
-  }
+    },
+  },
 };
 </script>
 

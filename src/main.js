@@ -4,12 +4,14 @@ import { BootstrapVue, FormInputPlugin, FormSelectPlugin, BootstrapVueIcons } fr
 import VueKonva from 'vue-konva'
 import { createPinia, PiniaVuePlugin } from 'pinia'
 import VueCompositionAPI from '@vue/composition-api'
+import Meta from 'vue-meta'
 
 Vue.use(FormInputPlugin)
 Vue.use(FormSelectPlugin)
 Vue.use(BootstrapVueIcons)
 Vue.use(BootstrapVue)
 Vue.use(VueKonva)
+Vue.use(Meta)
 
 Vue.use(PiniaVuePlugin)
 const pinia = createPinia()
