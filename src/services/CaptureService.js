@@ -37,6 +37,15 @@ export const captureService = {
     },
 
     /**
+     * Cancels a planned stop of the ongoing capture of the given audio source.
+     * @param {string} audioSourceId The ID of the audio source.
+     * @returns A promise which resolves once the stop was cancelled.
+     */
+    cancelCaptureStop(audioSourceId) {
+        return api.delete(`v1/capture/${audioSourceId}/planned-stop`)
+    },
+
+    /**
      * Get the current capture on a specific audio source.
      * @param {string} audioSourceId The ID of the audio source.
      * @returns A promise with the response.

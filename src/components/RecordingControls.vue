@@ -21,12 +21,11 @@
     >
     <b-button
       class="recording-button"
-      @click="stopRecording(true)"
+      @click="toggleRecordingStop(true)"
       :hidden="!isRecording && !terminationPending"
-      :disabled="terminationPending"
       variant="danger"
       :style="stopRecordingStyle"
-      >Stop after track</b-button
+      >{{ terminationPending ? "Cancel stop" : "Stop after track" }}</b-button
     >
     <b-button
       class="recording-button"
@@ -107,6 +106,16 @@ export default {
         .catch((error) => {
           console.error(`Could not stop recording on ${this.audioSource.name}.`, error)
         })
+    },
+    toggleRecordingStop(afterTrack) {
+      if (this.terminationPending) {
+        captureService.cancelCaptureStop(this.audioSource.id)
+          .then(() => {
+            this.terminationPending = false
+          })
+      } else {
+        this.stopRecording(afterTrack)
+      }
     }
   }
 };
