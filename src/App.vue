@@ -3,6 +3,7 @@
     <div :style="backgroundClass">
       <RecordingSidebar />
       <RecordingContentPane />
+      <InitialSetupModal id="initial-setup-modal" />
     </div>
   </div>
 </template>
@@ -13,6 +14,7 @@ import RecordingContentPane from "./components/RecordingContentPane.vue";
 import { eventService } from "@/services/EventService";
 import { getRecordingState } from "@/stores/RecordingState";
 import { getThemeState } from "@/stores/ThemeState";
+import InitialSetupModal from "./components/settings/InitialSetupModal.vue";
 
 export default {
   name: "App",
@@ -22,7 +24,8 @@ export default {
   components: {
     RecordingSidebar,
     RecordingContentPane,
-  },
+    InitialSetupModal
+},
   data() {
     return {
       backgroundClass: {},

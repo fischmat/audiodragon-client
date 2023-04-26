@@ -28,7 +28,7 @@
 import RecordingControls from "./RecordingControls.vue";
 import FileFormatSelector from "./FileFormatSelector.vue";
 import CaptureSourceSettings from "./CaptureSourceSettings.vue";
-import SettingsModal from './SettingsModal.vue';
+import SettingsModal from './settings/SettingsModal.vue';
 
 export default {
   components: { RecordingControls, FileFormatSelector, CaptureSourceSettings, SettingsModal },

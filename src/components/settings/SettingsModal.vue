@@ -140,7 +140,7 @@
 
 <script>
 import _ from "lodash";
-import { settingsService } from "../services/SettingsService.js";
+import { settingsService } from "@/services/SettingsService";
 import vueJsonEditor from 'vue-json-editor'
 
 export default {
