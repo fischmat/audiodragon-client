@@ -17,7 +17,7 @@ This is the web application - see [here](https://github.com/fischmat/audiodragon
 > This project is currently under development. It contains bugs and may not be usable at all on some machines.
 > Please do not report issues yet.
 
-![](config/readme/assets/screenshot.png "Screenshot")
+![](config/readme/screenshot.png "Screenshot")
 
 ## Legal Notice
 
