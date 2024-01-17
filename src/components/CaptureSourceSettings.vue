@@ -28,6 +28,7 @@
         v-for="f of availableAudioFormats"
         :key="JSON.stringify(f)"
         :value="f"
+        :title="longFormatDescriptor(f)"
         >{{ formatDescriptor(f) }}</b-form-select-option
       >
     </b-form-select>
@@ -124,7 +125,7 @@ export default {
         .then((formats) => {
           // Do not show formats that are above stereo for now:
           const monoOrStereoFormats = _.filter(formats, (f) => f.channels <= 2);
-          
+
           const formatsWithDefaults = _.map(monoOrStereoFormats, this.convertAudioFormat);
           return _.sortBy(
             _.uniqBy(formatsWithDefaults, JSON.stringify),
@@ -142,9 +143,31 @@ export default {
       } else {
         channelDesc = `${format.channels} channels`;
       }
-      const endianess = format.bigEndian ? "big endian" : "little endian";
+      const endianess = format.bigEndian ? "BE" : "LE";
+      const encoding = this.encodingName(format.encoding);
+      return `${channelDesc}, ${format.sampleSizeInBits} bits, ${encoding} ${endianess}`;
+    },
 
-      return `${channelDesc}, ${format.sampleSizeInBits} bits, ${endianess} (${format.encoding})`;
+    longFormatDescriptor(format) {
+      var channels;
+      if (format.channels == 1) {
+        channels = "1 channel";
+      } else {
+        channels = `${format.channels} channels`;
+      }
+      const endianess = format.bigEndian ? "big-endian" : "little-endian";
+      const encoding = this.encodingName(format.encoding);
+      return `${channels} with ${format.sampleSizeInBits} bits per sample and ${endianess} ${encoding} encoding`
+    },
+
+    encodingName(encoding) {
+      switch(encoding) {
+        case "PCM_SIGNED": return "PCM";
+        case "PCM_UNSIGNED": return "PCM (unsigned)";
+        case "ALAW": return "A-law";
+        case "ULAW": return "µ-law";
+        default: return encoding;
+      }
     },
 
     scoreAudioFormat(format) {
