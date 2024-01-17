@@ -1,5 +1,6 @@
 <template>
   <div id="content">
+      <WarningBar />
       <TrackInfoPanel id="track-info-panel" />
       <RecordingMetrics id="recording-metrics" />
   </div>
@@ -8,9 +9,10 @@
 <script>
 import TrackInfoPanel from './TrackInfoPanel.vue'
 import RecordingMetrics from './RecordingMetrics.vue'
+import WarningBar from './WarningBar.vue';
 
 export default {
-  components: { TrackInfoPanel, RecordingMetrics },
+  components: { TrackInfoPanel, RecordingMetrics, WarningBar },
   name: "RecordingContentPane"
 };
 </script>
