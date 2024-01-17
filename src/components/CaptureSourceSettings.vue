@@ -122,7 +122,10 @@ export default {
       return audioSourceService
         .getAudioFormats(audioSource)
         .then((formats) => {
-          const formatsWithDefaults = _.map(formats, this.convertAudioFormat);
+          // Do not show formats that are above stereo for now:
+          const monoOrStereoFormats = _.filter(formats, (f) => f.channels <= 2);
+          
+          const formatsWithDefaults = _.map(monoOrStereoFormats, this.convertAudioFormat);
           return _.sortBy(
             _.uniqBy(formatsWithDefaults, JSON.stringify),
             this.scoreAudioFormat
