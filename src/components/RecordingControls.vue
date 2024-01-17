@@ -5,7 +5,9 @@
       v-model="recognizeSongs"
       value="true"
       unchecked-value="false"
-      :disabled="isRecording"
+      :disabled="isRecording || recognitionNotPossible"
+      v-b-tooltip.hover 
+      :title="recognitionNotPossible ? 'Track recognition is not possible. Please configure an API key in the settings first. Reload page afterwards.' : 'Whether tracks should be automatically recognized.'"
       switch
     >
       Recognize songs
@@ -42,10 +44,12 @@
 </template>
 
 <script>
+import _ from "lodash";
 import { getRecordingState } from '../stores/RecordingState'
 import { captureService } from '../services/CaptureService'
 import { eventService } from '@/services/EventService'
 import { getThemeState } from '@/stores/ThemeState'
+import { settingsService } from "@/services/SettingsService"
 
 var recordingState = null
 
@@ -58,6 +62,7 @@ export default {
       outputFormat: null,
       currentCapture: null,
       recognizeSongs: true,
+      recognitionNotPossible: false,
       terminationPending: false,
       themeState: getThemeState()
     };
@@ -90,6 +95,11 @@ export default {
     eventService.capture().onEnded(() => {
       this.terminationPending = false
     })
+
+    this.isTrackRecognitionPossible().then((isPossible) => {
+      this.recognizeSongs = isPossible;
+      this.recognitionNotPossible = !isPossible;
+    });
   },
   methods: {
     startRecording() {
@@ -116,6 +126,11 @@ export default {
       } else {
         this.stopRecording(afterTrack)
       }
+    },
+    async isTrackRecognitionPossible() {
+      const settings = await settingsService.getSettings();
+      const apiToken = settings.recognition.rapidApiToken;
+      return apiToken && !_.every(apiToken, (c) => c == 'X');
     }
   }
 };
