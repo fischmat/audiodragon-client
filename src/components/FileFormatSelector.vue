@@ -1,5 +1,6 @@
 <template>
   <div>
+    <label class="sidebar-heading">File Output</label>
     <label for="bit-rate">Bit rate</label>
     <b-form-select
       id="bit-rate"
@@ -83,6 +84,12 @@ export default {
 </script>
 
 <style scoped>
+.sidebar-heading {
+  width: 100%;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
 label {
   margin-top: 10px;
 }

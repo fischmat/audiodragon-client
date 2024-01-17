@@ -1,5 +1,6 @@
 <template>
   <div>
+    <label class="sidebar-heading">Audio Input</label>
     <label for="audio-source-select">Audio source:</label>
     <b-form-select
       id="audio-source-select"
@@ -169,6 +170,12 @@ export default {
 </script>
 
 <style scoped>
+.sidebar-heading {
+  width: 100%;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
 label {
   margin-top: 10px;
 }
