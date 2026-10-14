@@ -6,6 +6,10 @@ module.exports = defineConfig({
 		host: 'localhost',
 		port: 3000,
 		https: false,
+    proxy: {
+      '/v1': { target: 'http://localhost:8080' },
+      '/events': { target: 'http://localhost:8080', ws: true },
+    },
   },
   configureWebpack: {
     devtool: 'source-map',

@@ -1,9 +1,9 @@
 
 export const appConfig = {
     backend: {
-        protocol: 'http',
-        host: 'localhost',
-        port: '8080',
+        protocol: window.location.protocol.replace(':', ''),
+        host: window.location.hostname,
+        port: window.location.port || (window.location.protocol === 'https:' ? '443' : '80'),
         apiPath: '',
 
         websocket: {
