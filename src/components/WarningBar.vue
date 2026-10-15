@@ -40,7 +40,7 @@ export default {
     },
     computed: {
         anyProblem() {
-            return !this.jreInfo.isSupported || !this.isTrackRecognitionPossible
+            return !this.jreInfo.isSupported || !this.recognitionPossible
         }
     }
 };
