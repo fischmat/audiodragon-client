@@ -154,8 +154,8 @@ export default {
       console.log(options);
 
       if (!this.options.sortOrder) {
-        this.sortBy = "UPDATED_AT";
-        this.sortOrder = "DESC";
+        this.options.sortBy = "UPDATED_AT";
+        this.options.sortOrder = "DESC";
       }
       this.page = 0;
       this.loadNextPage(true);
