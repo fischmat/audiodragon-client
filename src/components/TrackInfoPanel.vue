@@ -134,9 +134,10 @@ export default {
   methods: {
     getTrackData(audioSourceId) {
       captureService.getCurrentTrack(audioSourceId).then((track) => {
-        this.track = track ? track : EMPTY_TRACK;
-        this.recordingState.currentTrack = track;
-        this.updateThemeFromImage(track.coverartImageUrl);
+        const currentTrack = track ? track : _.cloneDeep(EMPTY_TRACK);
+        this.track = currentTrack;
+        this.recordingState.currentTrack = currentTrack;
+        this.updateThemeFromImage(currentTrack.coverartImageUrl);
       });
     },
     updateThemeFromImage(imageUrl) {
