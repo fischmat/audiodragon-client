@@ -31,21 +31,29 @@ const WS_TOPIC_METRICS = '/metrics'
 const WS_TOPIC_LIBRARY = '/library'
 
 export const eventService = {
+    connected: false,
+    connecting: false,
+    stompClient: null,
     
     /**
      * Connects this service with the backend.
      * This function must be initially called before any events can be processed.
      */
     connect() {
-        if (this.connected) {
+        if (this.connected || this.connecting) {
             console.debug("Event service already connected")
+            return
         }
+        this.connecting = true
         const wsEndpoint = `${appConfig.backend.protocol}://${appConfig.backend.host}:${appConfig.backend.port}${appConfig.backend.websocket.endpoint}`
         console.debug(`Connecting to websocket endpoint at ${wsEndpoint}`)
         const stompClient = Stomp.over(new SockJS(wsEndpoint))
+        this.stompClient = stompClient
         stompClient.connect(
             {},
             () => {
+                this.connected = true
+                this.connecting = false
                 stompClient.subscribe(WS_TOPIC_CAPTURE, (tick) => {
                     const event = JSON.parse(tick.body)
                     PubSub.publish(event.type, event)
@@ -63,6 +71,8 @@ export const eventService = {
                 })
             },
             (error) => {
+                this.connecting = false
+                this.connected = false
                 console.log(error)
             }
         )
