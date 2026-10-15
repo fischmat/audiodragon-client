@@ -78,7 +78,7 @@ export default {
     },
     persistState(state) {
       localStorage.audioSource = JSON.stringify(state.audioSource);
-      localStorage.audioFormatId = JSON.stringify(state.audioFormat);
+      localStorage.audioFormat = JSON.stringify(state.audioFormat);
       localStorage.outputFormat = JSON.stringify(state.outputFormat);
     },
   },
