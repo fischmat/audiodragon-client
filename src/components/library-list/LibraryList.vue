@@ -72,6 +72,8 @@ export default {
       items: [],
       page: 0,
       loading: false,
+      hasMore: true,
+      requestVersion: 0,
       options: {
         sortBy: "UPDATED_AT",
         sortOrder: "DESC",
@@ -91,7 +93,7 @@ export default {
     this.loadNextPage();
 
     eventService.library().initialized(() => {
-      this.loadNextPage();
+      this.loadNextPage(true);
     });
     eventService.library().refreshed(() => {
       this.page = 0;
@@ -105,24 +107,44 @@ export default {
 
   methods: {
     loadNextPage(reset = false) {
-      this.page += 1;
+      if ((!reset && this.loading) || (!reset && !this.hasMore)) {
+        return;
+      }
+
+      if (reset) {
+        this.requestVersion += 1;
+        this.page = 0;
+        this.items = [];
+        this.hasMore = true;
+      }
+
+      const requestVersion = this.requestVersion;
+      const nextPage = this.page + 1;
       this.loading = true;
       libraryService
         .getItems(
           this.options.search,
-          this.page,
+          nextPage,
           20,
           this.options.sortBy,
           this.options.sortOrder,
           this.options.filters
         )
         .then((items) => {
-          this.loading = false;
-          if (reset) {
-            this.page = 1;
-            this.items = items;
-          } else {
+          if (requestVersion === this.requestVersion) {
+            this.page = nextPage;
             this.items.push(...items);
+            this.hasMore = items.length === 20;
+          }
+        })
+        .catch((error) => {
+          if (requestVersion === this.requestVersion) {
+            console.error("Could not load library items.", error);
+          }
+        })
+        .finally(() => {
+          if (requestVersion === this.requestVersion) {
+            this.loading = false;
           }
         });
     },
