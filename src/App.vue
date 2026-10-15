@@ -1,92 +1,40 @@
 <template>
-  <div id="app">
-    <div :style="backgroundClass">
-      <RecordingSidebar />
-      <RecordingContentPane />
-      <InitialSetupModal id="initial-setup-modal" />
-    </div>
-  </div>
+  <main class="studio-shell">
+    <i class="ambient violet"></i><i class="ambient cyan"></i>
+    <aside class="studio-nav">
+      <div class="brand">AUDIO<br>DRAGON</div><p>CAPTURE · DISCOVER · KEEP</p>
+      <button v-for="item in navigation" :key="item.id" :class="{active: activeView === item.id}" @click="activeView = item.id"><span></span>{{ item.label }}</button>
+      <small>v0.1 · Desktop studio</small>
+    </aside>
+    <section class="studio-content">
+      <header><div><p class="eyebrow">{{ activeView === 'record' ? 'LIVE CAPTURE' : activeView.toUpperCase() }}</p><h1>{{ pageTitle }}</h1><p class="lede">{{ pageDescription }}</p></div><div class="state" :class="{recording:isRecording}"><i></i>{{ isRecording ? 'RECORDING LIVE' : 'READY TO CAPTURE' }}</div></header>
+      <section v-if="activeView === 'record'">
+        <section class="panel cockpit"><div><p class="eyebrow">NOW {{ isRecording ? 'RECORDING' : 'PLAYING' }}</p><NowPlayingCard /></div><RecordingControls /></section>
+        <section class="record-grid"><section class="panel signal"><h2>Sound is arriving</h2><div class="quality"><i></i>{{ inputQualitySummary }}</div><FrequencyMeter /><p>When silence is detected, the current song will be tagged and added to your library.</p></section><section class="panel overview"><h2>Session overview</h2><dl><div><dt>Selected source</dt><dd>{{ selectedSourceName }}</dd></div><div><dt>Recognition</dt><dd class="positive">On</dd></div><div><dt>Output</dt><dd>{{ outputSummary }}</dd></div></dl></section></section>
+        <section class="setup-grid"><section class="panel"><CaptureSourceSettings /></section><section class="panel"><FileFormatSelector /></section></section>
+      </section>
+      <section v-else-if="activeView === 'library'" class="panel library"><LibraryList /></section>
+      <section v-else class="panel settings"><SettingsModal /></section>
+    </section>
+    <InitialSetupModal id="initial-setup-modal" />
+  </main>
 </template>
 
 <script>
-import RecordingSidebar from "./components/RecordingSidebar.vue";
-import RecordingContentPane from "./components/RecordingContentPane.vue";
 import { eventService } from "@/services/EventService";
 import { getRecordingState } from "@/stores/RecordingState";
-import { getThemeState } from "@/stores/ThemeState";
-import InitialSetupModal from "./components/settings/InitialSetupModal.vue";
-
-export default {
-  name: "App",
-  metaInfo: {
-    title: "Audio Dragon"
-  },
-  components: {
-    RecordingSidebar,
-    RecordingContentPane,
-    InitialSetupModal
-},
-  data() {
-    return {
-      backgroundClass: {},
-    };
-  },
-  mounted() {
-    const recordingState = this.loadState();
-    const themeState = getThemeState();
-    eventService.connect();
-
-    eventService.capture().onStarted((event) => {
-      recordingState.currentCapture = event.capture;
-    });
-    eventService.capture().onEnded(() => {
-      recordingState.currentCapture = null;
-    });
-    eventService.track().onWritten((e) => {
-      this.$bvToast.toast(`Track written to ${e.path}`, {
-        title: "File written",
-        autoHideDelay: 5000,
-        appendToast: true,
-      });
-    });
-
-    recordingState.$subscribe((_, state) => {
-      this.persistState(state);
-    });
-    themeState.$subscribe((_, state) => {
-      if (state.darkMuted) {
-        this.backgroundClass = {
-          background: `linear-gradient(180deg, ${state.darkMuted} 0%, #141414 59%)`,
-        };
-      }
-    });
-  },
-
-  methods: {
-    loadState() {
-      const recordingState = getRecordingState();
-      if (localStorage.audioSource) {
-        recordingState.audioSource = JSON.parse(localStorage.audioSource);
-      }
-      if (localStorage.audioFormat) {
-        recordingState.audioFormat = JSON.parse(localStorage.audioFormat);
-      }
-      if (localStorage.outputFormat) {
-        recordingState.outputFormat = JSON.parse(localStorage.outputFormat);
-      }
-      return recordingState;
-    },
-    persistState(state) {
-      localStorage.audioSource = JSON.stringify(state.audioSource);
-      localStorage.audioFormatId = JSON.stringify(state.audioFormat);
-      localStorage.outputFormat = JSON.stringify(state.outputFormat);
-    },
-  },
-};
+import CaptureSourceSettings from "@/components/CaptureSourceSettings.vue";
+import FileFormatSelector from "@/components/FileFormatSelector.vue";
+import FrequencyMeter from "@/components/FrequencyMeter.vue";
+import RecordingControls from "@/components/RecordingControls.vue";
+import LibraryList from "@/components/library-list/LibraryList.vue";
+import SettingsModal from "@/components/settings/SettingsModal.vue";
+import NowPlayingCard from "@/components/NowPlayingCard.vue";
+import InitialSetupModal from "@/components/settings/InitialSetupModal.vue";
+export default { name:"App", components:{CaptureSourceSettings,FileFormatSelector,FrequencyMeter,RecordingControls,LibraryList,SettingsModal,NowPlayingCard,InitialSetupModal}, data:()=>({activeView:"record",recordingState:getRecordingState(),navigation:[{id:"record",label:"Record"},{id:"library",label:"Library"},{id:"settings",label:"Settings"}]}), computed:{isRecording(){return !!this.recordingState.currentCapture},selectedSourceName(){return this.recordingState.audioSource ? this.recordingState.audioSource.name : "Choose a source"},pageTitle(){return {record:this.isRecording?"Recording your system audio":"Ready to capture your music",library:"Your library",settings:"Make AudioDragon yours"}[this.activeView]},pageDescription(){return {record:this.isRecording?"Everything is being saved safely. We will create a new track when the music changes.":"Choose a source, confirm sound is arriving, then start recording.",library:"Explore, organise and revisit every saved recording.",settings:"The defaults are tuned for high-quality capture; change only what you need."}[this.activeView]},inputQualitySummary(){const f=this.recordingState.audioFormat;return f?`${f.channels===2?"Stereo":"Mono"} · ${Math.round(f.sampleRate/1000)} kHz · Best available`:"Select a source to check quality"},outputSummary(){const f=this.recordingState.outputFormat;return f?`${f.bitRate} kbps MP3`:"Recommended quality"}},mounted(){if(localStorage.audioSource)this.recordingState.audioSource=JSON.parse(localStorage.audioSource);if(localStorage.audioFormat)this.recordingState.audioFormat=JSON.parse(localStorage.audioFormat);if(localStorage.outputFormat)this.recordingState.outputFormat=JSON.parse(localStorage.outputFormat);eventService.connect();eventService.capture().onStarted(e=>this.recordingState.currentCapture=e.capture);eventService.capture().onEnded(()=>this.recordingState.currentCapture=null);this.recordingState.$subscribe((_,s)=>{localStorage.audioSource=JSON.stringify(s.audioSource);localStorage.audioFormat=JSON.stringify(s.audioFormat);localStorage.outputFormat=JSON.stringify(s.outputFormat)})} };
 </script>
 
 <style lang="scss">
-@import "~@/assets/scss/vendors/bootstrap-vue/theme.scss";
-@import "node_modules/bootstrap/scss/bootstrap.scss";
-@import "node_modules/bootstrap-vue/src/index.scss";
+@import "~@/assets/scss/vendors/bootstrap-vue/theme.scss";@import "node_modules/bootstrap/scss/bootstrap.scss";@import "node_modules/bootstrap-vue/src/index.scss";
+:root{color-scheme:dark}body{margin:0;background:#0b0d12;color:#f4f7fb;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button{font:inherit}.studio-shell{min-height:100vh;display:flex;overflow:hidden;position:relative;background:#0b0d12}.ambient{position:fixed;border-radius:50%;pointer-events:none;filter:blur(90px);opacity:.22;animation:drift 16s ease-in-out infinite alternate}.violet{width:460px;height:460px;left:16%;top:10%;background:#8b5cf6}.cyan{width:360px;height:360px;right:5%;bottom:8%;background:#2dd4bf;animation-delay:-7s}.studio-nav{width:230px;flex:0 0 230px;z-index:1;padding:32px 16px;min-height:100vh;border-right:1px solid #30394e;background:rgba(10,12,18,.86);display:flex;flex-direction:column}.brand{font-size:24px;line-height:1.05;font-weight:800;letter-spacing:-.8px;margin-left:12px}.studio-nav p{margin:8px 12px 42px;color:#667085;font-size:10px;font-weight:700;letter-spacing:.8px}.studio-nav button{border:1px solid transparent;background:transparent;color:#c4cada;border-radius:12px;padding:12px;text-align:left;margin-bottom:8px;transition:.2s}.studio-nav button:hover{background:#1c2231;color:#fff}.studio-nav button.active{background:#232b3d;border-color:#8b5cf6;color:#fff}.studio-nav button span{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 12px 1px 2px;background:#667085}.studio-nav button.active span{background:#2dd4bf;box-shadow:0 0 12px #2dd4bf}.studio-nav small{margin:auto 12px 0;color:#667085}.studio-content{width:calc(100% - 230px);z-index:1;padding:38px 5.2vw 60px}.studio-content>header{display:flex;justify-content:space-between;gap:24px;margin-bottom:46px}.eyebrow{color:#2dd4bf;font-size:12px;font-weight:700;letter-spacing:1.3px;margin:0 0 8px}.studio-content h1{margin:0;font-size:clamp(32px,3.2vw,48px);line-height:1.06;letter-spacing:-1.6px;font-weight:800}.lede{margin:12px 0 0;color:#98a2b8;font-size:15px}.state{display:flex;align-items:center;gap:8px;white-space:nowrap;padding:9px 12px;border:1px solid #30394e;border-radius:999px;background:#1c2231;color:#e4e8f3;font-size:12px;font-weight:700}.state i{height:7px;width:7px;border-radius:50%;background:#98a2b8}.state.recording i{background:#fb7185;animation:pulse 1.8s infinite}.panel{background:rgba(20,24,36,.91);border:1px solid rgba(74,88,118,.48);border-radius:18px}.cockpit{display:flex;justify-content:space-between;gap:24px;padding:28px;align-items:center;box-shadow:0 18px 48px rgba(76,49,152,.26)}.record-grid,.setup-grid{display:grid;gap:24px;margin-top:24px}.record-grid{grid-template-columns:minmax(0,2fr) minmax(290px,1fr)}.setup-grid{grid-template-columns:1.45fr 1fr}.signal,.overview,.setup-grid>.panel{padding:24px}.panel h2{font-size:18px;font-weight:700;margin:0 0 16px}.quality{display:inline-flex;align-items:center;gap:8px;border:1px solid #40506e;border-radius:999px;padding:7px 10px;color:#e9eef9;font-weight:600;font-size:12px;background:#232b3d}.quality i{width:7px;height:7px;border-radius:50%;background:#2dd4bf}.signal .meter{height:135px;margin-top:20px;border-radius:14px;overflow:hidden;background:#0b0d12;filter:none}.signal p{margin:12px 0 0;font-size:13px;color:#98a2b8}.overview dl{margin:4px 0}.overview dl div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #30394e;padding:16px 0}.overview dt{color:#98a2b8;font-size:13px;font-weight:500}.overview dd{margin:0;text-align:right;font-size:14px;font-weight:700}.positive{color:#a3e635}.library,.settings{padding:24px}.settings{max-width:960px}@keyframes drift{from{transform:translate3d(-35px,-20px,0) scale(.9)}to{transform:translate3d(80px,55px,0) scale(1.14)}}@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(251,113,133,0)}100%{box-shadow:0 0 0 0 rgba(251,113,133,0)}}@media(max-width:960px){.studio-nav{width:180px;flex-basis:180px}.studio-content{width:calc(100% - 180px);padding:28px}.record-grid,.setup-grid{grid-template-columns:1fr}.cockpit{align-items:stretch;flex-direction:column}}
 </style>
