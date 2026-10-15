@@ -71,7 +71,7 @@ export default {
       this.trackLength = 0;
     });
   },
-  unmounted() {
+  beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
   },
   computed: {
