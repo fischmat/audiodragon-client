@@ -45,6 +45,10 @@ export const captureService = {
         return api.delete(`v1/capture/${audioSourceId}/planned-stop`)
     },
 
+    retryRecognition(audioSourceId) {
+        return api.post(`v1/capture/${audioSourceId}/retry-recognition`)
+    },
+
     /**
      * Get the current capture on a specific audio source.
      * @param {string} audioSourceId The ID of the audio source.

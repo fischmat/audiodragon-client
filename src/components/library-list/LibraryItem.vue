@@ -4,7 +4,8 @@
             <b-img id="cover" :src="item.coverartImageUrl" :alt="item.title" />
         </b-col>
         <b-col>
-            <span id="title" class="info-label">{{item.title}}</span>
+            <span id="title" class="info-label">{{item.title || 'Untitled recording'}}</span>
+            <span v-if="!item.title" class="needs-details">Needs details</span>
             <span id="artist" class="info-label">{{item.artist}}</span>
         </b-col>
         <b-col>
@@ -63,4 +64,5 @@ export default {
 #title {
     color: #fff;
 }
+.needs-details { color: #fde68a; font-size: 12px; font-weight: 700; }
 </style>
