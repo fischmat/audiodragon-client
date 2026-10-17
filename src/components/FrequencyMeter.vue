@@ -12,6 +12,7 @@
         :width="width"
         :height="height"
         :bar-color="barColor"
+        :max-y-axis="frequencyMax"
       />
     </div>
   </div>
@@ -50,11 +51,10 @@ export default {
     });
 
     eventService.capture().onEnded(() => {
-      this.frequencies = _.map(this.frequencies, () => 0.1);
+      this.frequencies = _.map(this.frequencies, () => 0);
     });
     eventService.metrics().frequencies((frequencies) => {
-      // Add a small offset such that the bars are never fully empty
-      this.frequencies = _.map(frequencies, (f) => f + 0.1);
+      this.frequencies = frequencies;
     });
     eventService.metrics().trackTime((t) => {
       this.trackTime = t;
@@ -81,6 +81,9 @@ export default {
         return "#ccc";
       }
       const freqSum = _.sum(this.frequencies);
+      if (freqSum <= 0) {
+        return this.themeState.vibrant || "#ff0023";
+      }
       const avgFrequencyLevel = _.sum(
         _.map(this.frequencies, (f, idx) => (f / freqSum) * idx)
       );
@@ -95,6 +98,10 @@ export default {
     },
     frequencySum() {
       return _.sum(this.frequencies);
+    },
+    frequencyMax() {
+      const maximum = _.max(this.frequencies);
+      return maximum > 0 ? maximum * 1.05 : 1;
     },
     trackProgress() {
       if (!this.trackLength) {
