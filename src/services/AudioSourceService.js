@@ -14,5 +14,13 @@ export const audioSourceService = {
             .then((response) => {
                 return response.data
             })
+    },
+
+    startPreview(audioSourceId, format) {
+        return api.post(`/v1/sources/${audioSourceId}/preview`, format)
+    },
+
+    stopPreview() {
+        return api.delete('/v1/sources/preview')
     }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="library-list">
     <b-row class="lib-list-header">
       <b-col>
         <b-icon-search id="search-icon" />  
@@ -165,11 +165,7 @@ export default {
 </script>
   
 <style scoped>
-.lib-list {
-  max-height: 500px;
-  min-height: 200px;
-  overflow-y: scroll;
-}
+.library-list{height:100%;min-height:0;display:flex;flex-direction:column}.library-list .b-overlay-wrap{display:flex;flex:1;min-height:0;flex-direction:column}.lib-list{flex:1;min-height:200px;overflow-y:auto}
 .lib-list-header {
   padding: 10px;
   margin: 10px;

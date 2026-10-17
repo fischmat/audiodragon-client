@@ -1,5 +1,6 @@
 <template>
-  <div id="recording-controls">
+  <div id="recording-controls" class="recording-controls">
+    <p class="control-caption">{{ isRecording ? 'Your capture is active and will save automatically.' : 'All set — start when music is playing.' }}</p>
     <b-form-checkbox
       id="recognize-songs"
       v-model="recognizeSongs"
@@ -19,7 +20,7 @@
       :disabled="!canRecord"
       :hidden="isRecording || terminationPending"
       variant="success"
-      >Start</b-button
+      >Start recording</b-button
     >
     <b-button
       class="recording-button"
@@ -27,7 +28,7 @@
       :hidden="!isRecording && !terminationPending"
       variant="danger"
       :style="stopRecordingStyle"
-      >{{ terminationPending ? "Cancel stop" : "Stop after track" }}</b-button
+      >{{ terminationPending ? "Keep recording" : "Stop after this track" }}</b-button
     >
     <b-button
       class="recording-button"
@@ -138,11 +139,26 @@ export default {
 
 <style scoped>
 #recording-controls {
-  text-align: left;
+  min-width: 230px;
+  text-align: right;
 }
 .recording-button {
-  width: 100%;
-  margin-top: 10px;
+  margin: 10px 0 0 8px;
+  border-radius: 10px;
+  border: 1px solid #8b5cf6;
+  background: #8b5cf6;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(139,92,246,.24);
+}
+.recording-button.btn-danger:not(:last-of-type) {
+  background: #232b3d;
+  border-color: #40506e;
+  box-shadow: none;
+}
+.control-caption { max-width: 245px; margin: 0 0 10px auto; color: #98a2b8; font-size: 12px; }
+.custom-switch { color: #cfd6e5; font-size: 13px; }
+@media (max-width: 960px) { #recording-controls { text-align:left; } .control-caption { margin-left:0; } .recording-button { margin-left:0; margin-right:8px; }
 }
 .spinner {
   margin-top: 10px;
