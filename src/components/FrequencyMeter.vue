@@ -130,6 +130,7 @@ export default {
 
 .track-progress-container {
   width: 100%;
+  margin-top: 14px;
 }
 .track-progress-bar {
   height: 2px;
