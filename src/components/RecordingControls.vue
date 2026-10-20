@@ -52,16 +52,11 @@ import { eventService } from '@/services/EventService'
 import { getThemeState } from '@/stores/ThemeState'
 import { settingsService } from "@/services/SettingsService"
 
-var recordingState = null
-
 export default {
   name: "RecordingControls",
   data() {
     return {
-      audioSource: null,
-      audioFormat: null,
-      outputFormat: null,
-      currentCapture: null,
+      recordingState: getRecordingState(),
       recognizeSongs: true,
       recognitionNotPossible: false,
       terminationPending: false,
@@ -70,10 +65,10 @@ export default {
   },
   computed: {
     canRecord() {
-      return this.audioSource && this.audioFormat
+      return this.recordingState.audioSource && this.recordingState.audioFormat
     },
     isRecording() {
-      return this.currentCapture != null
+      return this.recordingState.currentCapture != null
     },
     stopRecordingStyle() {
       if (this.themeState.vibrant) {
@@ -83,16 +78,6 @@ export default {
     }
   },
   mounted() {
-    recordingState = getRecordingState()
-
-    // We need to reflect the state into component data to enable computed properties on them
-    recordingState.$subscribe((_, state) => {
-      this.audioSource = state.audioSource
-      this.audioFormat = state.audioFormat
-      this.outputFormat = state.outputFormat
-      this.currentCapture = state.currentCapture
-    })
-
     eventService.capture().onEnded(() => {
       this.terminationPending = false
     })
@@ -102,15 +87,20 @@ export default {
       this.recognitionNotPossible = !isPossible;
     });
   },
+  watch: {
+    isRecording(isRecording) {
+      if (!isRecording) this.terminationPending = false
+    }
+  },
   methods: {
     startRecording() {
-        captureService.startCapture(this.audioSource.id, this.audioFormat, this.outputFormat, this.recognizeSongs)
+        captureService.startCapture(this.recordingState.audioSource.id, this.recordingState.audioFormat, this.recordingState.outputFormat, this.recognizeSongs)
           .catch((error) => {
-            console.error(`Could not start recording on ${this.audioSource.name}.`, error)
+            console.error(`Could not start recording on ${this.recordingState.audioSource.name}.`, error)
           })
     },
     stopRecording(afterTrack) {
-      captureService.stopCapture(afterTrack, this.audioSource.id)
+      captureService.stopCapture(afterTrack, this.recordingState.audioSource.id)
         .then(() => {
           this.terminationPending = afterTrack
         })
@@ -120,7 +110,7 @@ export default {
     },
     toggleRecordingStop(afterTrack) {
       if (this.terminationPending) {
-        captureService.cancelCaptureStop(this.audioSource.id)
+        captureService.cancelCaptureStop(this.recordingState.audioSource.id)
           .then(() => {
             this.terminationPending = false
           })
