@@ -33,7 +33,55 @@ import SettingsModal from "@/components/settings/SettingsModal.vue";
 import NowPlayingCard from "@/components/NowPlayingCard.vue";
 import TrackInfoPanel from "@/components/TrackInfoPanel.vue";
 import InitialSetupModal from "@/components/settings/InitialSetupModal.vue";
-export default { name:"App", components:{CaptureSourceSettings,FileFormatSelector,FrequencyMeter,RecordingControls,LibraryList,SettingsModal,NowPlayingCard,TrackInfoPanel,InitialSetupModal}, data:()=>({activeView:"record",recordingState:getRecordingState(),mascotImage:require("@/assets/mascot/audiodragon-mascot.png"),navigation:[{id:"record",label:"Record"},{id:"library",label:"Library"},{id:"settings",label:"Settings"}]}), computed:{isRecording(){return !!this.recordingState.currentCapture},mascotMotion(){if(!this.isRecording)return "is-static";const genre=(this.recordingState.currentTrack?.genres || []).join(" ").toLowerCase();if(!genre)return "is-recognizing";if(/techno|electronic|house|trance|rave|hardcore|dance/.test(genre))return "is-rave";if(/rock|metal|punk|alternative/.test(genre))return "is-rock";if(/hip.hop|rap|r&b|rnb/.test(genre))return "is-hiphop";if(/country|folk|schlager|traditional/.test(genre))return "is-country";if(/pop/.test(genre))return "is-pop";return "is-groove"},headerEyebrow(){return {record:"LIVE CAPTURE",trackDetails:"TRACK DETAILS",library:"LIBRARY",settings:"SETTINGS"}[this.activeView]},selectedSourceName(){return this.recordingState.audioSource ? this.recordingState.audioSource.name : "Choose a source"},pageTitle(){return {record:this.isRecording?"Recording your system audio":"Ready to capture your music",trackDetails:this.recordingState.currentTrack?.title || "Track details",library:"Your library",settings:"Make AudioDragon yours"}[this.activeView]},pageDescription(){return {record:this.isRecording?"Everything is being saved safely. We will create a new track when the music changes.":"Choose a source, confirm sound is arriving, then start recording.",trackDetails:"Review or correct what AudioDragon found. Your changes are saved to the active recording.",library:"Explore, organise and revisit every saved recording.",settings:"The defaults are tuned for high-quality capture; change only what you need."}[this.activeView]},inputQualitySummary(){const f=this.recordingState.audioFormat;return f?`${f.channels===2?"Stereo":"Mono"} · ${Math.round(f.sampleRate/1000)} kHz · Best available`:"Select a source to check quality"},outputSummary(){const f=this.recordingState.outputFormat;return f?`${f.bitRate} kbps MP3`:"Recommended quality"}},methods:{openTrackDetails(){this.activeView="trackDetails"}},mounted(){if(localStorage.audioSource)this.recordingState.audioSource=JSON.parse(localStorage.audioSource);if(localStorage.audioFormat)this.recordingState.audioFormat=JSON.parse(localStorage.audioFormat);if(localStorage.outputFormat)this.recordingState.outputFormat=JSON.parse(localStorage.outputFormat);eventService.connect();eventService.capture().onStarted(e=>this.recordingState.currentCapture=e.capture);eventService.capture().onEnded(()=>{this.recordingState.currentCapture=null;this.recordingState.currentTrack=null});eventService.track().onStarted(()=>this.recordingState.currentTrack=null);eventService.track().onRecognized(e=>this.recordingState.currentTrack=e.track);this.recordingState.$subscribe((_,s)=>{localStorage.audioSource=JSON.stringify(s.audioSource);localStorage.audioFormat=JSON.stringify(s.audioFormat);localStorage.outputFormat=JSON.stringify(s.outputFormat)})} };
+export default {
+  name: "App",
+  components: { CaptureSourceSettings, FileFormatSelector, FrequencyMeter, RecordingControls, LibraryList, SettingsModal, NowPlayingCard, TrackInfoPanel, InitialSetupModal },
+  data: () => ({ activeView: "record", recordingState: getRecordingState(), navigation: [{ id: "record", label: "Record" }, { id: "library", label: "Library" }, { id: "settings", label: "Settings" }] }),
+  computed: {
+    isRecording() { return !!this.recordingState.currentCapture },
+    mascotGenre() {
+      if (!this.isRecording) return "default";
+      const genre = (this.recordingState.currentTrack?.genres || []).join(" ").toLowerCase();
+      if (/country|folk|schlager|traditional|bluegrass|americana/.test(genre)) return "country";
+      if (/techno|electronic|house|trance|rave|hardcore|dance|eurodance|electro/.test(genre)) return "techno";
+      if (/rock|metal|punk|alternative|grunge|indie/.test(genre)) return "metal";
+      if (/hip.hop|rap|r&b|rnb|soul/.test(genre)) return "hiphop";
+      if (/pop|disco|funk/.test(genre)) return "pop";
+      if (/jazz|blues|swing/.test(genre)) return "jazz";
+      if (/classical|orchestra|opera|baroque|instrumental/.test(genre)) return "classical";
+      if (/reggae|ska|latin|salsa|reggaeton|world/.test(genre)) return "reggae";
+      return "default";
+    },
+    mascotImage() {
+      return {
+        country: require("@/assets/mascot/audiodragon-country.png"), techno: require("@/assets/mascot/audiodragon-techno.png"), metal: require("@/assets/mascot/audiodragon-metal.png"), hiphop: require("@/assets/mascot/audiodragon-hiphop.png"), pop: require("@/assets/mascot/audiodragon-pop.png"), jazz: require("@/assets/mascot/audiodragon-jazz.png"), classical: require("@/assets/mascot/audiodragon-classical.png"), reggae: require("@/assets/mascot/audiodragon-reggae.png"), default: require("@/assets/mascot/audiodragon-mascot.png")
+      }[this.mascotGenre];
+    },
+    mascotMotion() {
+      if (!this.isRecording) return "is-static";
+      if (!this.recordingState.currentTrack?.genres?.length) return "is-recognizing";
+      return { country: "is-country", techno: "is-rave", metal: "is-rock", hiphop: "is-hiphop", pop: "is-pop", jazz: "is-jazz", classical: "is-classical", reggae: "is-reggae", default: "is-groove" }[this.mascotGenre];
+    },
+    headerEyebrow() { return { record: "LIVE CAPTURE", trackDetails: "TRACK DETAILS", library: "LIBRARY", settings: "SETTINGS" }[this.activeView] },
+    selectedSourceName() { return this.recordingState.audioSource ? this.recordingState.audioSource.name : "Choose a source" },
+    pageTitle() { return { record: this.isRecording ? "Recording your system audio" : "Ready to capture your music", trackDetails: this.recordingState.currentTrack?.title || "Track details", library: "Your library", settings: "Make AudioDragon yours" }[this.activeView] },
+    pageDescription() { return { record: this.isRecording ? "Everything is being saved safely. We will create a new track when the music changes." : "Choose a source, confirm sound is arriving, then start recording.", trackDetails: "Review or correct what AudioDragon found. Your changes are saved to the active recording.", library: "Explore, organise and revisit every saved recording.", settings: "The defaults are tuned for high-quality capture; change only what you need." }[this.activeView] },
+    inputQualitySummary() { const f = this.recordingState.audioFormat; return f ? `${f.channels === 2 ? "Stereo" : "Mono"} · ${Math.round(f.sampleRate / 1000)} kHz · Best available` : "Select a source to check quality" },
+    outputSummary() { const f = this.recordingState.outputFormat; return f ? `${f.bitRate} kbps MP3` : "Recommended quality" }
+  },
+  methods: { openTrackDetails() { this.activeView = "trackDetails" } },
+  mounted() {
+    if (localStorage.audioSource) this.recordingState.audioSource = JSON.parse(localStorage.audioSource);
+    if (localStorage.audioFormat) this.recordingState.audioFormat = JSON.parse(localStorage.audioFormat);
+    if (localStorage.outputFormat) this.recordingState.outputFormat = JSON.parse(localStorage.outputFormat);
+    eventService.connect();
+    eventService.capture().onStarted(e => this.recordingState.currentCapture = e.capture);
+    eventService.capture().onEnded(() => { this.recordingState.currentCapture = null; this.recordingState.currentTrack = null });
+    eventService.track().onStarted(() => this.recordingState.currentTrack = null);
+    eventService.track().onRecognized(e => this.recordingState.currentTrack = e.track);
+    this.recordingState.$subscribe((_, s) => { localStorage.audioSource = JSON.stringify(s.audioSource); localStorage.audioFormat = JSON.stringify(s.audioFormat); localStorage.outputFormat = JSON.stringify(s.outputFormat) });
+  }
+};
 </script>
 
 <style lang="scss">
@@ -43,5 +91,7 @@ export default { name:"App", components:{CaptureSourceSettings,FileFormatSelecto
 /* Library and Settings use the spare studio height while the 60px content padding remains the bottom gutter. */
 .studio-content{box-sizing:border-box;min-height:100vh;display:flex;flex-direction:column}.library,.settings{min-height:0;flex:1 1 auto}.library{display:flex;flex-direction:column}.settings{max-width:none;overflow-y:auto}.settings>#settings{height:100%}
 .brand{display:flex;align-items:center;gap:9px;margin-left:7px}.brand span{font-size:24px;line-height:1.05;font-weight:800;letter-spacing:-.8px}.dragon-mascot{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 4px 9px rgba(45,212,191,.25));transform-origin:center bottom}.dragon-mascot.is-recognizing{animation:dragon-listening 1.4s ease-in-out infinite}.dragon-mascot.is-rave{animation:dragon-rave .58s cubic-bezier(.4,0,.2,1) infinite alternate}.dragon-mascot.is-rock{animation:dragon-rock .68s ease-in-out infinite}.dragon-mascot.is-hiphop{animation:dragon-nod .82s ease-in-out infinite}.dragon-mascot.is-country{animation:dragon-sway 1.8s ease-in-out infinite}.dragon-mascot.is-pop{animation:dragon-pop .9s ease-in-out infinite}.dragon-mascot.is-groove{animation:dragon-groove 1.15s ease-in-out infinite}@keyframes dragon-listening{50%{transform:translateY(-3px) rotate(2deg);filter:drop-shadow(0 0 12px rgba(45,212,191,.8))}}@keyframes dragon-rave{to{transform:translateY(-7px) rotate(8deg) scale(1.07);filter:drop-shadow(0 0 14px rgba(139,92,246,.85))}}@keyframes dragon-rock{25%{transform:rotate(-10deg) translateY(3px)}55%{transform:rotate(9deg) translateY(-4px)}75%{transform:rotate(-6deg)}}@keyframes dragon-nod{50%{transform:translateY(5px) rotate(-3deg)}}@keyframes dragon-sway{50%{transform:rotate(7deg) translateX(2px)}}@keyframes dragon-pop{50%{transform:translateY(-5px) scale(1.05);filter:drop-shadow(0 0 12px rgba(251,113,133,.72))}}@keyframes dragon-groove{50%{transform:rotate(-4deg) translateY(-2px);filter:drop-shadow(0 0 11px rgba(45,212,191,.65))}}
+.dragon-mascot.is-jazz{animation:dragon-jazz 1.35s ease-in-out infinite}.dragon-mascot.is-classical{animation:dragon-conduct 1.5s ease-in-out infinite}.dragon-mascot.is-reggae{animation:dragon-reggae 1.05s ease-in-out infinite}
+@keyframes dragon-jazz{50%{transform:rotate(-4deg) translateY(-2px) scale(1.035)}}@keyframes dragon-conduct{30%{transform:rotate(-4deg) translateY(-2px)}70%{transform:rotate(3deg) translateY(2px)}}@keyframes dragon-reggae{25%{transform:rotate(-5deg) translateY(-2px)}75%{transform:rotate(5deg) translateY(2px)}}
 .studio-shell.library-active,.studio-shell.library-active .studio-content{height:100vh;min-height:0}.studio-shell.library-active .studio-content,.studio-shell.library-active .library{overflow:hidden}
 </style>
