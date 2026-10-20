@@ -165,7 +165,7 @@ export default {
 </script>
   
 <style scoped>
-.library-list{height:100%;min-height:0;display:flex;flex-direction:column}.library-list .b-overlay-wrap{display:flex;flex:1;min-height:0;flex-direction:column}.lib-list{flex:1;min-height:200px;overflow-y:auto}
+.library-list{height:100%;min-height:0;display:flex;flex-direction:column}.library-list .b-overlay-wrap{display:flex;flex:1;min-height:0;flex-direction:column}.lib-list{flex:1;min-height:0;overflow-y:auto}
 .lib-list-header {
   padding: 10px;
   margin: 10px;
