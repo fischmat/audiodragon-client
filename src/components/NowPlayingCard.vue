@@ -26,7 +26,82 @@ import { eventService } from "@/services/EventService";
 import { getRecordingState } from "@/stores/RecordingState";
 import { captureService } from "@/services/CaptureService";
 const EMPTY_TRACK = { title: "", artist: "", coverartImageUrl: null };
-export default { name:"NowPlayingCard", data:()=>({track:_.cloneDeep(EMPTY_TRACK),recordingState:getRecordingState(),recognitionState:"idle",showManualEntry:false,manualTrack:{title:"",artist:""}}), computed:{isRecording(){return !!this.recordingState.currentCapture},isRecognizing(){return this.isRecording && !this.track.coverartImageUrl && this.recognitionState !== "unrecognized"}},mounted(){eventService.track().onRecognized(e=>{this.track=e.track;this.recognitionState="recognized"});eventService.track().onRecognitionFailed(()=>{this.recognitionState="unrecognized"});eventService.track().onStarted(()=>{this.track=_.cloneDeep(EMPTY_TRACK);this.recognitionState="recognizing";this.showManualEntry=false});eventService.track().onEnded(()=>{this.track=_.cloneDeep(EMPTY_TRACK);this.recognitionState="idle";this.showManualEntry=false})},methods:{retryRecognition(){this.recognitionState="recognizing";captureService.retryRecognition(this.recordingState.audioSource.id).catch(()=>{this.recognitionState="unrecognized"})},saveDetails(){const details={title:this.manualTrack.title,artist:this.manualTrack.artist};captureService.updateCurrentTrack(details,this.recordingState.audioSource.id).then(()=>{this.track={...this.track,...details};this.recognitionState="recognized";this.showManualEntry=false})}} };
+export default {
+  name: "NowPlayingCard",
+  data: () => ({ track: _.cloneDeep(EMPTY_TRACK), recordingState: getRecordingState(), recognitionState: "idle", showManualEntry: false, manualTrack: { title: "", artist: "" } }),
+  computed: {
+    isRecording() { return !!this.recordingState.currentCapture },
+    isRecognizing() { return this.isRecording && !this.track.coverartImageUrl && this.recognitionState !== "unrecognized" }
+  },
+  watch: {
+    isRecording(isRecording) {
+      if (isRecording) this.hydrateCurrentTrack();
+    },
+    "recordingState.currentTrack"(track) {
+      if (this.hasTrackDetails(track)) this.applyTrack(track);
+    }
+  },
+  mounted() {
+    this.applyTrack(this.recordingState.currentTrack);
+    this.hydrateCurrentTrack();
+    eventService.track().onRecognized(e => {
+      this.recordingState.currentTrack = e.track;
+      this.applyTrack(e.track);
+    });
+    eventService.track().onRecognitionFailed(() => { this.recognitionState = "unrecognized" });
+    eventService.track().onStarted(() => {
+      this.track = _.cloneDeep(EMPTY_TRACK);
+      this.recordingState.currentTrack = null;
+      this.recognitionState = "recognizing";
+      this.showManualEntry = false;
+    });
+    eventService.track().onEnded(() => {
+      this.track = _.cloneDeep(EMPTY_TRACK);
+      this.recordingState.currentTrack = null;
+      this.recognitionState = "idle";
+      this.showManualEntry = false;
+    });
+  },
+  methods: {
+    hasTrackDetails(track) {
+      return !!(track && (track.title || track.artist || track.album || track.coverartImageUrl));
+    },
+    applyTrack(track) {
+      if (!this.hasTrackDetails(track)) return;
+      this.track = { ..._.cloneDeep(EMPTY_TRACK), ...track };
+      this.manualTrack = { title: this.track.title || "", artist: this.track.artist || "" };
+      this.recognitionState = "recognized";
+    },
+    hydrateCurrentTrack() {
+      const audioSourceId = this.recordingState.audioSource?.id;
+      if (!audioSourceId || this.hasTrackDetails(this.recordingState.currentTrack)) return;
+      captureService.getCurrentTrack(audioSourceId)
+        .then(track => {
+          if (this.hasTrackDetails(track)) {
+            this.recordingState.currentTrack = track;
+            this.applyTrack(track);
+          } else if (this.isRecording) {
+            this.recognitionState = "recognizing";
+          }
+        })
+        .catch(() => {
+          if (this.isRecording) this.recognitionState = "recognizing";
+        });
+    },
+    retryRecognition() {
+      this.recognitionState = "recognizing";
+      captureService.retryRecognition(this.recordingState.audioSource.id).catch(() => { this.recognitionState = "unrecognized" });
+    },
+    saveDetails() {
+      const details = { title: this.manualTrack.title, artist: this.manualTrack.artist };
+      captureService.updateCurrentTrack(details, this.recordingState.audioSource.id).then(() => {
+        this.recordingState.currentTrack = { ...this.track, ...details };
+        this.applyTrack(this.recordingState.currentTrack);
+        this.showManualEntry = false;
+      });
+    }
+  }
+};
 </script>
 
 <style scoped>
